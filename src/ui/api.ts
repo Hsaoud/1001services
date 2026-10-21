@@ -66,6 +66,8 @@ export interface UiApi {
 
   /** Fournit les icônes de plats (data URL rendues en 3D). Peut renvoyer '' tant qu'elles ne sont pas prêtes. */
   setDishIconProvider(fn: (id: DishId) => string): void;
+  /** Fournit le portrait 3D en pied de La Duchesse pour la Garde-robe. */
+  setDuchessPortraitProvider?(fn: () => string): void;
 
   // ── Menus
   showTitle(info: TitleInfo, h: TitleHandlers): void;

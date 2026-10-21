@@ -678,6 +678,146 @@ const cakeDisplay: Builder = (ctx, d, gy, r) => {
   void r;
 };
 
+/**
+ * Ajoute un bibelot ou objet d'orfèvrerie luxueux sur une étagère (repère local : y = dessus de la planche)
+ * et renvoie la largeur (en m) occupée le long de l'étagère.
+ */
+export function addShelfLuxuryItem(
+  batch: StaticBatch,
+  style: SalonCtx['style'],
+  x: number,
+  y: number,
+  z: number,
+  kind: number,
+  r: () => number,
+  tall = true,
+): number {
+  const gold = vc('gold');
+  const cer = vc('ceramic');
+  const sat = vc('satin');
+  const vel = vc('velvet');
+  const glass = vcGlass(0.24);
+  const bordeaux = '#581c34';
+  const cream = '#fff8ec';
+  const rose = '#f4b8c4';
+
+  switch (((kind % 8) + 8) % 8) {
+    case 0: {
+      // Service à thé en porcelaine & or (théière ventrue + tasse sur soucoupe)
+      const cx = x + 0.08;
+      batch.add(chamferCylinder(0.048, 0.055, 0.018, 0.005, 14), gold, M(cx, y + 0.009, z), { color: style.metal, tall, cast: false });
+      batch.add(sphere(0.068, 14, 10), cer, M(cx, y + 0.075, z, 0, 1, 0.88, 1), { color: cream, tall });
+      batch.add(torus(0.056, 0.007, 6, 18), gold, M(cx, y + 0.085, z, 0, 1, 1, 1, Math.PI / 2), { color: style.metal, tall, cast: false });
+      batch.add(chamferCylinder(0.036, 0.042, 0.018, 0.006, 12), gold, M(cx, y + 0.132, z), { color: style.metal, tall, cast: false });
+      batch.add(sphere(0.016, 8, 6), gold, M(cx, y + 0.155, z), { color: style.metal, tall, cast: false });
+      // Anse et bec verseur dorés
+      batch.add(torus(0.038, 0.007, 6, 14, Math.PI), gold, M(cx - 0.055, y + 0.08, z, 0, 1, 1, 1, 0, Math.PI / 2), { color: style.metal, tall, cast: false });
+      batch.add(cylinder(0.008, 0.015, 0.065, 8), gold, M(cx + 0.052, y + 0.065, z, 0, 1, 1, 1, 0, -0.65), { color: style.metal, tall, cast: false });
+      // Tasse & soucoupe assorties
+      const tx = cx + 0.11;
+      batch.add(chamferCylinder(0.042, 0.032, 0.01, 0.004, 12), cer, M(tx, y + 0.005, z + 0.01), { color: cream, tall, cast: false });
+      batch.add(chamferCylinder(0.03, 0.022, 0.042, 0.005, 12), cer, M(tx, y + 0.028, z + 0.01), { color: rose, tall });
+      batch.add(torus(0.029, 0.004, 5, 12), gold, M(tx, y + 0.048, z + 0.01, 0, 1, 1, 1, Math.PI / 2), { color: style.metal, tall, cast: false });
+      return 0.24;
+    }
+    case 1: {
+      // Candélabre royal en or à deux branches
+      const cx = x + 0.1;
+      batch.add(chamferCylinder(0.046, 0.056, 0.024, 0.008, 14), gold, M(cx, y + 0.012, z), { color: style.metal, tall });
+      batch.add(cylinder(0.011, 0.016, 0.16, 8), gold, M(cx, y + 0.02, z), { color: style.metal, tall });
+      batch.add(sphere(0.02, 8, 6), gold, M(cx, y + 0.11, z), { color: style.metal, tall, cast: false });
+      batch.add(torus(0.055, 0.008, 6, 16, Math.PI), gold, M(cx, y + 0.145, z, 0, 1, 1, 1, Math.PI), { color: style.metal, tall, cast: false });
+      for (const sx of [-0.055, 0.055]) {
+        batch.add(chamferCylinder(0.02, 0.014, 0.014, 0.004, 10), gold, M(cx + sx, y + 0.15, z), { color: style.metal, tall, cast: false });
+        batch.add(cylinder(0.01, 0.011, 0.075, 8), cer, M(cx + sx, y + 0.156, z), { color: cream, tall, cast: false });
+        batch.add(cone(0.009, 0.028, 6), vcGlow(2.2), M(cx + sx, y + 0.232, z), { color: '#ffd26a', tall, cast: false });
+      }
+      return 0.21;
+    }
+    case 2: {
+      // Cloche d'apparat dorée sur plateau d'orfèvrerie
+      const cx = x + 0.11;
+      batch.add(chamferCylinder(0.092, 0.082, 0.014, 0.005, 18), vc('chrome'), M(cx, y + 0.007, z), { color: '#eef3f7', tall });
+      batch.add(torus(0.088, 0.006, 5, 18), gold, M(cx, y + 0.014, z, 0, 1, 1, 1, Math.PI / 2), { color: style.metal, tall, cast: false });
+      batch.add(sphere(0.074, 16, 10), gold, M(cx, y + 0.016, z, 0, 1, 0.85, 1), { color: style.metal, tall });
+      batch.add(torus(0.016, 0.005, 6, 12), gold, M(cx, y + 0.088, z), { color: style.metal, tall, cast: false });
+      return 0.22;
+    }
+    case 3: {
+      // Carafe en cristal à élixir rubis & deux coupes dorées
+      const cx = x + 0.08;
+      batch.add(chamferCylinder(0.044, 0.05, 0.016, 0.005, 12), gold, M(cx, y + 0.008, z), { color: style.metal, tall, cast: false });
+      batch.add(sphere(0.048, 12, 8), vel, M(cx, y + 0.062, z, 0, 1, 0.85, 1), { color: '#8c1d3b', tall, cast: false });
+      batch.add(sphere(0.058, 14, 10), glass, M(cx, y + 0.068, z, 0, 1, 1.05, 1), { color: '#fff5f8', tall, cast: false, receive: false });
+      batch.add(cylinder(0.016, 0.022, 0.085, 10), glass, M(cx, y + 0.11, z), { color: '#fff5f8', tall, cast: false, receive: false });
+      batch.add(torus(0.02, 0.006, 6, 12), gold, M(cx, y + 0.155, z, 0, 1, 1, 1, Math.PI / 2), { color: style.metal, tall, cast: false });
+      batch.add(sphere(0.02, 10, 8), gold, M(cx, y + 0.205, z, 0, 0.85, 1.25, 0.85), { color: style.metal, tall, cast: false });
+      // Petite coupe à pied d'or
+      const gx = cx + 0.095;
+      batch.add(chamferCylinder(0.022, 0.026, 0.01, 0.003, 10), gold, M(gx, y + 0.005, z + 0.01), { color: style.metal, tall, cast: false });
+      batch.add(cylinder(0.005, 0.006, 0.055, 6), gold, M(gx, y + 0.01, z + 0.01), { color: style.metal, tall, cast: false });
+      batch.add(chamferCylinder(0.026, 0.014, 0.045, 0.005, 10), glass, M(gx, y + 0.085, z + 0.01), { color: '#fff5f8', tall, cast: false, receive: false });
+      return 0.22;
+    }
+    case 4: {
+      // Bonbonnière en cristal garnie de macarons pastel
+      const cx = x + 0.09;
+      batch.add(chamferCylinder(0.052, 0.06, 0.02, 0.006, 14), gold, M(cx, y + 0.01, z), { color: style.metal, tall });
+      const macCols = ['#f6c6d0', '#a8d8c8', '#f5d488', '#c9b6e4', '#e86a7a'];
+      for (let m = 0; m < 4; m++) {
+        batch.add(
+          chamferCylinder(0.032, 0.032, 0.022, 0.008, 10),
+          sat,
+          M(cx + (m % 2 ? 0.01 : -0.01), y + 0.032 + m * 0.026, z + (m > 1 ? 0.008 : -0.008)),
+          { color: macCols[(m + Math.floor(r() * 3)) % macCols.length], tall, cast: false },
+        );
+      }
+      batch.add(cylinder(0.058, 0.058, 0.135, 14), glass, M(cx, y + 0.02, z), { color: '#f8fcfc', tall, cast: false, receive: false });
+      batch.add(chamferCylinder(0.062, 0.058, 0.022, 0.008, 14), gold, M(cx, y + 0.162, z), { color: style.metal, tall });
+      batch.add(sphere(0.018, 8, 6), gold, M(cx, y + 0.186, z), { color: style.metal, tall, cast: false });
+      return 0.19;
+    }
+    case 5: {
+      // Duo de boîtes à thé impériales (velours bordeaux & laque ivoire, blasons d'or)
+      const cx = x + 0.065;
+      batch.add(roundedBox(0.082, 0.165, 0.082, 0.018, 1), vel, M(cx, y + 0.082, z), { color: bordeaux, tall });
+      batch.add(box(0.048, 0.068, 0.008), gold, M(cx, y + 0.085, z + 0.041), { color: style.metal, tall, cast: false });
+      batch.add(chamferCylinder(0.032, 0.036, 0.028, 0.008, 12), gold, M(cx, y + 0.178, z), { color: style.metal, tall, cast: false });
+      const cx2 = cx + 0.09;
+      batch.add(roundedBox(0.068, 0.125, 0.068, 0.015, 1), cer, M(cx2, y + 0.062, z + 0.01), { color: cream, tall });
+      batch.add(box(0.04, 0.05, 0.008), gold, M(cx2, y + 0.065, z + 0.043), { color: style.metal, tall, cast: false });
+      batch.add(chamferCylinder(0.026, 0.03, 0.022, 0.006, 10), gold, M(cx2, y + 0.134, z + 0.01), { color: style.metal, tall, cast: false });
+      return 0.21;
+    }
+    case 6: {
+      // Vase Médicis doré et bouquet de roses du salon
+      const cx = x + 0.09;
+      batch.add(urnGeo(0.22), gold, M(cx, y, z), { color: style.metal, tall });
+      for (let q = 0; q < 4; q++) {
+        const a = (q / 4) * Math.PI * 2 + 0.4;
+        batch.add(
+          flowerGeo(0.034),
+           vc('matte'),
+          M(cx + Math.cos(a) * 0.032, y + 0.165 + (q % 2) * 0.018, z + Math.sin(a) * 0.032, a),
+          { color: style.flowers[q % style.flowers.length], tall, cast: false },
+        );
+      }
+      return 0.19;
+    }
+    default: {
+      // Pendule royale de salon en or ciselé et velours bordeaux
+      const cx = x + 0.11;
+      batch.add(roundedBox(0.15, 0.028, 0.09, 0.008, 1), gold, M(cx, y + 0.014, z), { color: style.metal, tall });
+      batch.add(roundedBox(0.12, 0.16, 0.072, 0.022, 1), vel, M(cx, y + 0.105, z), { color: bordeaux, tall });
+      batch.add(roundedBox(0.132, 0.172, 0.064, 0.024, 1), gold, M(cx, y + 0.105, z - 0.003), { color: style.metal, tall });
+      batch.add(chamferCylinder(0.042, 0.042, 0.014, 0.004, 16), cer, M(cx, y + 0.115, z + 0.036, 0, 1, 1, 1, Math.PI / 2), { color: cream, tall, cast: false });
+      batch.add(torus(0.043, 0.006, 6, 16), gold, M(cx, y + 0.115, z + 0.042), { color: style.metal, tall, cast: false });
+      batch.add(sphere(0.022, 10, 8), gold, M(cx, y + 0.205, z), { color: style.metal, tall, cast: false });
+      return 0.22;
+    }
+  }
+}
+
 const bookshelf: Builder = (ctx, d, gy, r) => {
   const { batch, style } = ctx;
   const W = d.w ?? 1.2;
@@ -685,30 +825,54 @@ const bookshelf: Builder = (ctx, d, gy, r) => {
   const D = 0.34;
   const [px, pz] = snapToWall(ctx, d, D / 2);
   const wood = style.id === 'galerie' ? '#f3ede4' : style.id === 'boudoir' ? '#f2dcd6' : '#efe8d8';
+  const backCol = style.id === 'jardin' ? shade(wood, -0.08) : '#581c34';
+  const gold = vc('gold');
   batch.push(M(px, gy, pz, d.rot));
-  batch.add(roundedBox(W, H, 0.03, 0.01, 1), vc('satin'), M(0, H / 2, -D / 2 + 0.015), { color: shade(wood, -0.08), tall: true });
-  for (const s of [-1, 1]) batch.add(roundedBox(0.04, H, D, 0.01, 1), vc('satin'), M((s * (W - 0.04)) / 2, H / 2, 0), { color: wood, tall: true });
-  batch.add(roundedBox(W + 0.08, 0.08, D + 0.06, 0.02, 1), vc('satin'), M(0, H + 0.04, 0.01), { color: wood, tall: true });
-  batch.add(box(W + 0.02, 0.016, 0.016), vc('gold'), M(0, H, D / 2 + 0.02), { color: style.metal, tall: true, cast: false });
+  // Fond capitonné / velours bordeaux sombre et montants moulurés à filets d'or
+  batch.add(roundedBox(W, H, 0.03, 0.01, 1), vc('velvet'), M(0, H / 2, -D / 2 + 0.015), { color: backCol, tall: true });
+  for (const s of [-1, 1]) {
+    batch.add(roundedBox(0.045, H, D, 0.01, 1), vc('satin'), M((s * (W - 0.045)) / 2, H / 2, 0), { color: wood, tall: true });
+    batch.add(box(0.016, H - 0.08, 0.016), gold, M((s * (W - 0.045)) / 2, H / 2, D / 2 + 0.006), { color: style.metal, tall: true, cast: false });
+  }
+  // Corniche royale et fronton doré au sommet
+  batch.add(roundedBox(W + 0.09, 0.085, D + 0.07, 0.02, 1), vc('satin'), M(0, H + 0.04, 0.01), { color: wood, tall: true });
+  batch.add(box(W + 0.04, 0.02, 0.02), gold, M(0, H, D / 2 + 0.022), { color: style.metal, tall: true, cast: false });
+  batch.add(archGeo(Math.min(0.55, W * 0.45), 0.045, 0.04, 12), gold, M(0, H + 0.075, D / 2 - 0.02), { color: style.metal, tall: true, cast: false });
+  batch.add(sphere(0.048, 10, 8), gold, M(0, H + 0.14, D / 2), { color: style.metal, tall: true, cast: false });
+
   const shelves = 5;
-  const bookCols = ['#7a2e3a', '#a8b89a', '#e8b4b8', '#3d4a6b', '#d4a537', '#9f86c0', '#f3e3c8', '#6b4a3a'];
+  const bookCols = ['#581c34', '#7a2e3a', '#a8b89a', '#e8b4b8', '#3d4a6b', '#d4a537', '#9f86c0', '#f3e3c8', '#6b4a3a'];
   for (let k = 0; k < shelves; k++) {
     const y = 0.08 + k * ((H - 0.12) / shelves);
     batch.add(box(W - 0.06, 0.03, D - 0.03), vc('satin'), M(0, y, 0), { color: wood, tall: true });
-    let x = -W / 2 + 0.06;
-    while (x < W / 2 - 0.1) {
-      const bw = 0.035 + r() * 0.03;
-      const bh = 0.2 + r() * 0.12;
-      if (r() < 0.12) {
-        // petit objet : vase ou boule
-        batch.add(sphere(0.06, 10, 8), vc('ceramic'), M(x + 0.06, y + 0.075, 0.02), { color: style.accent, tall: true });
-        x += 0.16;
+    // Filet d'or sur la tranche de chaque étagère
+    batch.add(box(W - 0.07, 0.012, 0.012), gold, M(0, y + 0.002, (D - 0.03) / 2 + 0.005), { color: style.metal, tall: true, cast: false });
+
+    const yTop = y + 0.015;
+    let x = -W / 2 + 0.065;
+    let itemSlot = (k * 3 + Math.floor(r() * 4)) % 8;
+    while (x < W / 2 - 0.11) {
+      // Plus de décors luxueux : ~45 % d'objets d'orfèvrerie, porcelaine, pâtisserie et cristal
+      if (x < W / 2 - 0.24 && r() < 0.46) {
+        const wUsed = addShelfLuxuryItem(batch, style, x, yTop, 0.02, itemSlot++, r, true);
+        x += wUsed + 0.025;
         continue;
       }
-      const lean = r() < 0.08 ? 0.25 : 0;
-      batch.add(box(bw, bh, D - 0.1), vc('satin'), M(x + bw / 2, y + 0.015 + bh / 2, 0.02, 0, 1, 1, 1, 0, lean), { color: bookCols[Math.floor(r() * bookCols.length)], tall: true });
-      x += bw + 0.004 + lean * 0.1;
+      const bw = 0.036 + r() * 0.028;
+      const bh = 0.19 + r() * 0.11;
+      const lean = r() < 0.08 ? 0.22 : 0;
+      const bCol = bookCols[Math.floor(r() * bookCols.length)];
+      batch.add(box(bw, bh, D - 0.1), vc('satin'), M(x + bw / 2, yTop + bh / 2, 0.02, 0, 1, 1, 1, 0, lean), { color: bCol, tall: true });
+      // Dos de reliure doré
+      if (lean === 0 && r() < 0.65) {
+        batch.add(box(bw * 0.82, 0.012, 0.008), gold, M(x + bw / 2, yTop + bh * 0.76, (D - 0.1) / 2 + 0.022), { color: style.metal, tall: true, cast: false });
+      }
+      x += bw + 0.005 + lean * 0.09;
     }
+  }
+  // Ornements au sommet de la bibliothèque (urnes dorées et cloche centrale)
+  for (const sx of [-W * 0.34, W * 0.34]) {
+    batch.add(urnGeo(0.24), gold, M(sx, H + 0.08, 0), { color: style.metal, tall: true });
   }
   batch.pop();
 };

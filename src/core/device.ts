@@ -69,26 +69,103 @@ export function vibrate(pattern: number | number[]): void {
   }
 }
 
-/** Vérifie si le mode plein écran est disponible (non disponible sur iOS Safari). */
+/** Vérifie si un élément est actuellement en plein écran. */
+export function isFullscreen(): boolean {
+  if (typeof document === 'undefined') return false;
+  const doc = document as unknown as {
+    fullscreenElement?: Element;
+    webkitFullscreenElement?: Element;
+    mozFullScreenElement?: Element;
+    msFullscreenElement?: Element;
+  };
+  return !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
+}
+
+/** Vérifie si le mode plein écran est disponible (ou API préfixée Webkit/Blink). */
 export function fullscreenAvailable(): boolean {
   if (typeof document === 'undefined') return false;
-  return !!document.documentElement.requestFullscreen && document.fullscreenEnabled !== false;
+  const el = document.documentElement as unknown as {
+    requestFullscreen?: unknown;
+    webkitRequestFullscreen?: unknown;
+    webkitRequestFullScreen?: unknown;
+    mozRequestFullScreen?: unknown;
+    msRequestFullscreen?: unknown;
+  };
+  const doc = document as unknown as {
+    fullscreenEnabled?: boolean;
+    webkitFullscreenEnabled?: boolean;
+    mozFullScreenEnabled?: boolean;
+  };
+  const hasFn = !!(el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen);
+  return hasFn && doc.fullscreenEnabled !== false && doc.webkitFullscreenEnabled !== false;
 }
 
 /** Bascule le mode plein écran. */
 export function toggleFullscreen(): void {
-  if (!fullscreenAvailable()) return;
-  if (document.fullscreenElement) {
-    void document.exitFullscreen?.().catch(() => {});
+  if (isFullscreen()) {
+    exitFullscreen();
   } else {
-    void document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+    enterFullscreen();
   }
 }
 
-/** Entre en plein écran si permis. */
+/** Quitte le plein écran si actif. */
+export function exitFullscreen(): void {
+  if (typeof document === 'undefined') return;
+  const doc = document as unknown as {
+    exitFullscreen?: () => Promise<void>;
+    webkitExitFullscreen?: () => void;
+    mozCancelFullScreen?: () => void;
+    msExitFullscreen?: () => void;
+  };
+  try {
+    if (doc.exitFullscreen) void doc.exitFullscreen().catch(() => {});
+    else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen();
+    else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
+    else if (doc.msExitFullscreen) doc.msExitFullscreen();
+  } catch {
+    // Ignoré
+  }
+}
+
+/** Entre en plein écran si permis (supporte les variantes Webkit). */
 export function enterFullscreen(): void {
-  if (!fullscreenAvailable() || document.fullscreenElement) return;
-  void document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+  if (typeof document === 'undefined' || isFullscreen()) return;
+  const el = document.documentElement as unknown as {
+    requestFullscreen?: (opts?: { navigationUI?: string }) => Promise<void>;
+    webkitRequestFullscreen?: () => void;
+    webkitRequestFullScreen?: () => void;
+    mozRequestFullScreen?: () => void;
+    msRequestFullscreen?: () => void;
+  };
+  try {
+    if (el.requestFullscreen) {
+      void el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {
+        void el.requestFullscreen?.().catch(() => {});
+      });
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else if (el.webkitRequestFullScreen) {
+      el.webkitRequestFullScreen();
+    } else if (el.mozRequestFullScreen) {
+      el.mozRequestFullScreen();
+    } else if (el.msRequestFullscreen) {
+      el.msRequestFullscreen();
+    }
+  } catch {
+    // Ignoré si rejeté
+  }
+}
+
+/** Tente de forcer le paysage, le plein écran et le masquage des barres d'adresse/en-têtes. */
+export async function forceLandscapeAndFullscreen(): Promise<void> {
+  enterFullscreen();
+  await lockLandscape();
+  if (typeof window !== 'undefined') {
+    window.scrollTo(0, 1);
+    setTimeout(() => window.scrollTo(0, 1), 60);
+    setTimeout(() => window.scrollTo(0, 1), 260);
+  }
 }
 
 class DeviceTracker {

@@ -83,6 +83,8 @@ export interface GameRendererApi {
 
   /** Icône PNG (data URL, ~96 px, fond transparent) d'un plat, rendue depuis son modèle 3D. Mise en cache. */
   dishIcon(id: DishId): string;
+  /** Portrait en pied de La Duchesse sur son piédestal royal (data URL PNG), rendu depuis son modèle 3D. */
+  duchessPortrait?(): string;
 
   setQuality(q: Settings['quality']): void;
   /** Teinte de post-process d'urgence (0..1) : marée de mousse, fin de minuteur. */

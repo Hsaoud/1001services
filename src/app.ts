@@ -44,6 +44,7 @@ export class App {
     this.renderer = new GameRenderer(gameLayer);
     this.ui = new UI(uiLayer);
     this.ui.setDishIconProvider((id) => this.renderer.dishIcon(id));
+    this.ui.setDuchessPortraitProvider?.(() => this.renderer.duchessPortrait?.() ?? '');
     this.applySettings(this.save.settings);
 
     device.init();

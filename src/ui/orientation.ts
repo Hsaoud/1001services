@@ -5,7 +5,7 @@
  *   affiche un écran d'invitation au pivotement avec animation, bloquant les contrôles
  *   jusqu'à ce que l'appareil soit tourné à l'horizontale.
  */
-import { isPortrait, isTouchDevice, lockLandscape } from '../core/device';
+import { forceLandscapeAndFullscreen, isFullscreen, isPortrait, isTouchDevice, lockLandscape } from '../core/device';
 
 export class OrientationGuard {
   readonly el: HTMLElement;
@@ -44,7 +44,7 @@ export class OrientationGuard {
 
     const btn = this.el.querySelector('.dz-og-lockbtn') as HTMLButtonElement | null;
     btn?.addEventListener('click', () => {
-      void lockLandscape();
+      void forceLandscapeAndFullscreen();
     });
 
     // Écoute des changements d'orientation et redimensionnement
@@ -55,10 +55,19 @@ export class OrientationGuard {
       screen.orientation.addEventListener('change', check);
     }
 
-    // Dès le premier toucher sur l'écran d'orientation, tenter de verrouiller en paysage
+    // Dès le premier toucher sur l'écran d'orientation, forcer paysage et plein écran
     this.el.addEventListener('pointerdown', () => {
-      void lockLandscape();
+      void forceLandscapeAndFullscreen();
     });
+
+    // Sur mobile en paysage, forcer le plein écran dès le premier geste tactile
+    const tryFullscreenOnTouch = () => {
+      if (!isPortrait() && isTouchDevice() && !isFullscreen()) {
+        void forceLandscapeAndFullscreen();
+      }
+    };
+    window.addEventListener('pointerdown', tryFullscreenOnTouch, { passive: true });
+    window.addEventListener('touchend', tryFullscreenOnTouch, { passive: true });
 
     this.check();
   }
@@ -75,11 +84,15 @@ export class OrientationGuard {
     const shouldBlock = touch && portrait;
 
     if (shouldBlock !== this.active) {
+      const wasActive = this.active;
       this.active = shouldBlock;
       this.el.classList.toggle('dz-off', !shouldBlock);
       this.el.classList.toggle('is-visible', shouldBlock);
       if (shouldBlock) {
         void lockLandscape();
+      } else if (wasActive && touch) {
+        // Sortie du mode portrait -> passage en paysage : forcer le plein écran immédiatement !
+        void forceLandscapeAndFullscreen();
       }
       this.onPortraitChange?.(shouldBlock);
     }

@@ -8,10 +8,11 @@ import { StaticBatch, M } from '../batch';
 import { vc, vcGlass, shadowOnly } from '../mats';
 import { GeoBuilder, molding, PROFILES, balusterGeo, archGeo, archPanelGeo, box } from '../geo';
 import { exteriorTexture, skyTexture, wallTexture } from '../textures';
-import { roundedBox, sphere, chamferCylinder } from '../kit';
+import { roundedBox, sphere, chamferCylinder, torus, cylinder } from '../kit';
 import type { SalonCtx } from './context';
 import { rand, seedOf } from './context';
 import { SalonGrid, WALL_H, WALL_LOW, RAIL_H } from './grid';
+import { addShelfLuxuryItem } from './decor';
 
 const DIRS: [number, number][] = [
   [1, 0],
@@ -170,7 +171,8 @@ export function buildWalls(ctx: SalonCtx, openings: Set<number>): void {
     batch.pop();
   }
 
-  buildWindows(ctx, runs);
+  const windowCells = buildWindows(ctx, runs);
+  buildLuxuryShelves(ctx, runs, windowCells);
   buildRails(ctx);
   buildGlass(ctx);
   buildRoofLattice(ctx);
@@ -247,7 +249,7 @@ function busyWallCells(ctx: SalonCtx): Set<number> {
   return s;
 }
 
-function buildWindows(ctx: SalonCtx, runs: FaceRun[]): void {
+function buildWindows(ctx: SalonCtx, runs: FaceRun[]): Set<number> {
   const { style, batch } = ctx;
   const busy = busyWallCells(ctx);
   const skyMat = new THREE.MeshBasicMaterial({ map: skyTexture(style.windowSky[0], style.windowSky[1]) });
@@ -257,6 +259,7 @@ function buildWindows(ctx: SalonCtx, runs: FaceRun[]): void {
   const gold = vc('gold');
   const arched = style.id !== 'jardin';
   const r = rand(seedOf(ctx.layout.seed, 404));
+  const windowCells = new Set<number>();
   for (const run of runs) {
     if (run.h < WALL_H - 0.01) continue;
     // fenêtres seulement sur les murs du fond (faces tournées vers la caméra)
@@ -268,6 +271,9 @@ function buildWindows(ctx: SalonCtx, runs: FaceRun[]): void {
     for (let k = start; k < len - 1; k += spacing) {
       const cell = run.cells[k];
       if (busy.has(cell) || busy.has(run.cells[k - 1]) || busy.has(run.cells[k + 1])) continue;
+      windowCells.add(cell);
+      if (run.cells[k - 1] !== undefined) windowCells.add(run.cells[k - 1]);
+      if (run.cells[k + 1] !== undefined) windowCells.add(run.cells[k + 1]);
       const m = runMatrix(run).multiply(M(k + 0.5, run.y0, 0));
       batch.push(m);
       const ww = 0.8;
@@ -298,6 +304,81 @@ function buildWindows(ctx: SalonCtx, runs: FaceRun[]): void {
         cast: false,
       });
       batch.pop();
+    }
+  }
+  return windowCells;
+}
+
+/**
+ * Étagères murales d'apparat et tablettes de murets garnies d'objets luxueux autour du restaurant.
+ */
+function buildLuxuryShelves(ctx: SalonCtx, runs: FaceRun[], windowCells: Set<number>): void {
+  const { style, batch } = ctx;
+  const busy = busyWallCells(ctx);
+  const trim = vc('satin');
+  const gold = vc('gold');
+  const wood = style.id === 'galerie' ? '#f3ede4' : style.id === 'boudoir' ? '#f2dcd6' : '#efe8d8';
+  const r = rand(seedOf(ctx.layout.seed, 777));
+  let itemCounter = 0;
+
+  for (const run of runs) {
+    const len = run.b - run.a;
+    if (len < 2) continue;
+
+    // 1. Murs hauts : étagères murales d'apparat en bois noble avec consoles dorées sculptées
+    if (run.h >= WALL_H - 0.01) {
+      if (run.dx < 0 || run.dz < 0) continue;
+      for (let k = 0; k < len; k++) {
+        const cell = run.cells[k];
+        if (busy.has(cell) || windowCells.has(cell)) continue;
+        const m = runMatrix(run).multiply(M(k + 0.5, run.y0, 0));
+        batch.push(m);
+        // Étagère double niveau (y1 = 1.22, y2 = 1.68)
+        const levels = [1.22, 1.68];
+        const shelfW = 0.74;
+        const shelfD = 0.22;
+        for (const sy of levels) {
+          batch.add(roundedBox(shelfW, 0.03, shelfD, 0.008, 1), trim, M(0, sy, shelfD / 2), { color: wood, tall: true });
+          batch.add(box(shelfW, 0.012, 0.012), gold, M(0, sy, shelfD + 0.004), { color: style.metal, tall: true, cast: false });
+          // Consoles sculptées en volute dorée sous l'étagère
+          for (const sx of [-0.26, 0.26]) {
+            batch.add(
+              torus(0.065, 0.011, 6, 14, Math.PI * 0.9),
+              gold,
+              M(sx, sy - 0.065, 0.08, 0, 1, 1, 1, 0, Math.PI / 2),
+              { color: style.metal, tall: true, cast: false },
+            );
+            batch.add(sphere(0.014, 6, 4), gold, M(sx, sy - 0.13, 0.03), { color: style.metal, tall: true, cast: false });
+          }
+          // Objets d'orfèvrerie, pâtisseries et porcelaines sur l'étagère
+          let ox = -shelfW / 2 + 0.04;
+          while (ox < shelfW / 2 - 0.11) {
+            const wUsed = addShelfLuxuryItem(batch, style, ox, sy + 0.015, shelfD / 2, itemCounter++, r, true);
+            ox += wUsed + 0.03;
+          }
+        }
+        batch.pop();
+        windowCells.add(cell);
+      }
+    } else {
+      // 2. Murets bas du pourtour : étagère de desserte sur la couvertine du muret
+      for (let k = 1; k < len - 1; k += 2) {
+        const cell = run.cells[k];
+        if (busy.has(cell) || windowCells.has(cell)) continue;
+        const m = runMatrix(run).multiply(M(k + 0.5, run.y0, 0));
+        batch.push(m);
+        const ledgeY = run.h + 0.06;
+        // Galerie basse en laiton doré le long du rebord
+        batch.add(box(0.82, 0.014, 0.014), gold, M(0, ledgeY + 0.045, 0.08), { color: style.metal, cast: false });
+        for (const bx of [-0.38, 0, 0.38]) {
+          batch.add(cylinder(0.008, 0.008, 0.045, 6), gold, M(bx, ledgeY + 0.022, 0.08), { color: style.metal, cast: false });
+        }
+        // Objets d'orfèvrerie et douceurs royales sur le muret
+        addShelfLuxuryItem(batch, style, -0.26, ledgeY, 0, itemCounter++, r, false);
+        addShelfLuxuryItem(batch, style, 0.06, ledgeY, 0, itemCounter++, r, false);
+        batch.pop();
+        windowCells.add(cell);
+      }
     }
   }
 }

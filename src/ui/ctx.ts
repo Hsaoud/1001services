@@ -14,6 +14,8 @@ export interface UiCtx {
   titleHandlers: TitleHandlers | null;
   /** Mode actuellement choisi sur l'écran-titre. */
   titleMode: GameMode;
+  /** Fournisseur optionnel du portrait 3D de La Duchesse. */
+  duchessPortrait?: () => string;
 }
 
 export const MODE_NAME: Record<GameMode, string> = {

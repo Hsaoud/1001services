@@ -21,7 +21,7 @@ import type {
 } from '../types';
 import { createPlayerView } from './models/player';
 import { createNpcView } from './models/npcs';
-import { makeDishIcon } from './models/icons';
+import { makeDishIcon, makeDuchessPortrait } from './models/icons';
 import { disposeTree, damp } from './kit';
 import { CameraRig } from './camera';
 import { PostPipeline } from './post';
@@ -302,6 +302,10 @@ export class GameRenderer implements GameRendererApi {
       this.icons.set(id, url);
     }
     return url;
+  }
+
+  duchessPortrait(): string {
+    return makeDuchessPortrait(this.webglRenderer);
   }
 
   // ─────────────────────────────────────── Qualité, ambiance

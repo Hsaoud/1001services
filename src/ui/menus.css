@@ -888,6 +888,38 @@
   width: auto;
   max-width: 100%;
   filter: drop-shadow(0 calc(var(--u) * 0.4) calc(var(--u) * 0.6) rgba(91, 31, 42, 0.2));
+  z-index: 2;
+}
+
+.dz-duchess-portrait {
+  position: relative;
+  height: 94%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 calc(var(--u) * 0.8) calc(var(--u) * 1.4) rgba(91, 31, 42, 0.28));
+  animation: dz-fade-in 0.3s ease both;
+  z-index: 2;
+}
+
+.dz-wr-figure.dz-has-3d .dz-duchess-svg {
+  display: none;
+}
+
+.dz-wr-caption {
+  position: absolute;
+  bottom: calc(var(--u) * -0.8);
+  font-size: calc(var(--u) * 1.15);
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  color: var(--gold-4);
+  background: linear-gradient(180deg, #fffaf4, #f6e8da);
+  padding: calc(var(--u) * 0.25) calc(var(--u) * 1.2);
+  border-radius: 999px;
+  border: 1px solid var(--gold);
+  box-shadow: 0 calc(var(--u) * 0.3) calc(var(--u) * 0.8) rgba(91, 31, 42, 0.16);
+  white-space: nowrap;
+  z-index: 3;
 }
 
 .dz-wr-rings {

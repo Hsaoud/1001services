@@ -129,6 +129,10 @@ export class UI implements UiApi {
     this.icons.setProvider(fn);
   }
 
+  setDuchessPortraitProvider(fn: () => string): void {
+    this.ctx.duchessPortrait = fn;
+  }
+
   // ─────────────────────────────── Menus
 
   showTitle(info: TitleInfo, h: TitleHandlers): void {
