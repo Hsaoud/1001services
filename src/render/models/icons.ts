@@ -5,14 +5,10 @@
  */
 import * as THREE from 'three';
 import type { DishId } from '../../types';
-import { ceramic, chamferCylinder, mesh, torus } from '../kit';
-import { SATIN_GOLD, flatTorus, satin, stdMat } from './common';
 import { createDishMesh } from './dishes';
-import { compactFigure } from './figure';
-import { buildDuchessFigure } from './player';
+import blenderPortraitUrl from '../../assets/duchess/duchess-portrait.png?url';
 
 const cache = new Map<string, string>();
-let portraitCache = '';
 
 let scene: THREE.Scene | null = null;
 let camera: THREE.OrthographicCamera | null = null;
@@ -151,102 +147,9 @@ export function makeDishIcon(gl: THREE.WebGLRenderer, id: DishId, size = 96): st
   return url;
 }
 
-/**
- * Rend le portrait en pied de La Duchesse sur son piédestal royal (ivoire & or) pour l'écran de la Garde-robe.
+/** Beauty portrait rendered from the editable Blender sculpt with Cycles.
+ * Vite embeds it in the offline build; the gameplay character uses the same sculpt's mesh export.
  */
-export function makeDuchessPortrait(gl: THREE.WebGLRenderer, width = 260, height = 380): string {
-  if (portraitCache) return portraitCache;
-  if (typeof document === 'undefined') return '';
-
-  const { scene: sc, camera: cam } = setup();
-  const group = new THREE.Group();
-
-  // Socle royal en porcelaine ivoire et moulures d'or
-  const pedH = 0.24;
-  const ivoryMat = ceramic('#f7efe2');
-  const creamDarkMat = stdMat('ped:creamDark', { color: '#eadcc9', roughness: 0.55 });
-  const goldMat = satin(SATIN_GOLD);
-  const ped = new THREE.Group();
-  ped.add(mesh(chamferCylinder(0.46, 0.49, 0.045, 0.012, 48), ivoryMat, 0, 0.022, 0));
-  ped.add(mesh(flatTorus(0.455, 0.014, 8, 48), goldMat, 0, 0.046, 0));
-  ped.add(mesh(chamferCylinder(0.39, 0.43, 0.12, 0.01, 48), creamDarkMat, 0, 0.11, 0));
-  const pedBand = mesh(torus(0.41, 0.013, 8, 48), goldMat, 0, 0.11, 0);
-  pedBand.rotation.x = Math.PI / 2;
-  ped.add(pedBand);
-  ped.add(mesh(chamferCylinder(0.44, 0.41, 0.055, 0.014, 48), ivoryMat, 0, 0.2, 0));
-  ped.add(mesh(flatTorus(0.43, 0.015, 8, 48), goldMat, 0, pedH - 0.005, 0));
-  group.add(ped);
-
-  // La Duchesse posée sur le socle dans une posture royale 3/4
-  const { fig } = buildDuchessFigure();
-  compactFigure(fig);
-  fig.root.position.y = pedH;
-  fig.root.rotation.y = -0.26;
-  fig.head.rotation.set(-0.05, 0.2, 0.02);
-  fig.armL.rotation.set(-0.18, 0.1, 0.28);
-  fig.armR.rotation.set(-0.24, -0.1, -0.26);
-  fig.setExpr('smile');
-  group.add(fig.root);
-
-  sc.add(group);
-  group.updateMatrixWorld(true);
-  const box = new THREE.Box3();
-  group.traverse((o) => {
-    if ((o as THREE.Mesh).isMesh) box.expandByObject(o);
-  });
-
-  const viewDir = new THREE.Vector3(Math.sin(0.28) * Math.cos(0.32), Math.sin(0.32), Math.cos(0.28) * Math.cos(0.32)).normalize();
-  const center = box.getCenter(new THREE.Vector3());
-  cam.position.copy(center).addScaledVector(viewDir, 5);
-  cam.up.set(0, 1, 0);
-  cam.lookAt(center);
-  cam.updateMatrixWorld(true);
-
-  const inv = cam.matrixWorldInverse;
-  const pts: THREE.Vector3[] = [];
-  for (let i = 0; i < 8; i++) {
-    pts.push(new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).applyMatrix4(inv));
-  }
-  const vb = new THREE.Box3().setFromPoints(pts);
-  const aspect = width / height;
-  const bw = (vb.max.x - vb.min.x) * 1.08;
-  const bh = (vb.max.y - vb.min.y) * 1.06;
-  const halfH = Math.max(bh * 0.5, (bw * 0.5) / aspect);
-  const halfW = halfH * aspect;
-  const cx = (vb.max.x + vb.min.x) / 2;
-  const cy = (vb.max.y + vb.min.y) / 2;
-  cam.left = cx - halfW;
-  cam.right = cx + halfW;
-  cam.top = cy + halfH;
-  cam.bottom = cy - halfH;
-  cam.updateProjectionMatrix();
-
-  const W2 = width * 2;
-  const H2 = height * 2;
-  const rt = new THREE.WebGLRenderTarget(W2, H2, { samples: 4, colorSpace: THREE.SRGBColorSpace, type: THREE.UnsignedByteType });
-  const prevTarget = gl.getRenderTarget();
-  const prevClear = gl.getClearColor(new THREE.Color());
-  const prevAlpha = gl.getClearAlpha();
-  const prevAuto = gl.autoClear;
-  const prevShadowUpdate = gl.shadowMap.needsUpdate;
-  const pixels = new Uint8Array(W2 * H2 * 4);
-  try {
-    gl.setRenderTarget(rt);
-    gl.setClearColor(0x000000, 0);
-    gl.autoClear = true;
-    gl.clear(true, true, true);
-    gl.render(sc, cam);
-    gl.readRenderTargetPixels(rt, 0, 0, W2, H2, pixels);
-  } finally {
-    gl.setRenderTarget(prevTarget);
-    gl.setClearColor(prevClear, prevAlpha);
-    gl.autoClear = prevAuto;
-    gl.shadowMap.needsUpdate = prevShadowUpdate;
-    rt.dispose();
-    sc.remove(group);
-  }
-
-  portraitCache = pixelsToDataUrl(pixels, W2, H2, width, height);
-  return portraitCache;
+export function makeDuchessPortrait(_gl: THREE.WebGLRenderer, _width = 900, _height = 1300): string {
+  return blenderPortraitUrl;
 }
-

@@ -83,7 +83,7 @@ export interface GameRendererApi {
 
   /** Icône PNG (data URL, ~96 px, fond transparent) d'un plat, rendue depuis son modèle 3D. Mise en cache. */
   dishIcon(id: DishId): string;
-  /** Portrait en pied de La Duchesse sur son piédestal royal (data URL PNG), rendu depuis son modèle 3D. */
+  /** URL du portrait transparent de La Duchesse sur son piédestal, rendu depuis la sculpture Blender. */
   duchessPortrait?(): string;
 
   setQuality(q: Settings['quality']): void;
