@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UI Lab — Les 1001 Services de La Duchesse</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #f6e7e4;
+      }
+      #app {
+        position: fixed;
+        inset: 0;
+      }
+      /* Faux salon : dégradé pastel + parquet isométrique en losange. */
+      #fake-scene {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        background:
+          radial-gradient(ellipse 60% 50% at 30% 20%, rgba(255, 255, 255, 0.7), transparent 70%),
+          radial-gradient(ellipse 50% 60% at 85% 80%, rgba(181, 201, 176, 0.55), transparent 70%),
+          linear-gradient(160deg, #f8e4e1 0%, #f3d9d6 35%, #efe2cf 70%, #e3ead8 100%);
+      }
+      #fake-scene .floor {
+        position: absolute;
+        left: 50%;
+        top: 54%;
+        width: 92vmin;
+        height: 92vmin;
+        transform: translate(-50%, -50%) scaleY(0.58) rotate(45deg);
+        background:
+          repeating-conic-gradient(#f2d3cf 0 25%, #fbefe6 0 50%) 0 0 / 9vmin 9vmin;
+        box-shadow:
+          0 0 0 1.4vmin #e3c9a6,
+          0 0 0 2.2vmin #7a2e3a,
+          0 4vmin 6vmin rgba(91, 31, 42, 0.25);
+        border-radius: 1vmin;
+      }
+      #fake-scene .tbl {
+        position: absolute;
+        width: 6vmin;
+        height: 3.4vmin;
+        border-radius: 50%;
+        background: radial-gradient(circle at 40% 35%, #fff, #f0e1d0);
+        box-shadow: 0 1vmin 0 #c9a98a, 0 2vmin 2vmin rgba(91, 31, 42, 0.2);
+      }
+      #lab {
+        position: fixed;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        z-index: 1000;
+        display: flex;
+        align-items: flex-start;
+        font: 12px/1.2 system-ui, sans-serif;
+        pointer-events: none;
+      }
+      #lab > * {
+        pointer-events: auto;
+      }
+      #lab-toggle {
+        writing-mode: vertical-rl;
+        padding: 10px 5px;
+        border: 0;
+        border-radius: 6px 0 0 6px;
+        background: #5b1f2a;
+        color: #fbf3e8;
+        cursor: pointer;
+        font: 600 11px system-ui;
+        letter-spacing: 0.1em;
+      }
+      #lab-panel {
+        width: 190px;
+        max-height: 92vh;
+        overflow-y: auto;
+        padding: 8px;
+        background: rgba(30, 14, 18, 0.88);
+        color: #f3e6d6;
+        border-radius: 0 0 0 8px;
+        box-shadow: -4px 0 16px rgba(0, 0, 0, 0.3);
+      }
+      #lab.closed #lab-panel {
+        display: none;
+      }
+      #lab-panel h4 {
+        margin: 8px 0 4px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #d4a537;
+      }
+      #lab-panel button {
+        display: block;
+        width: 100%;
+        margin: 2px 0;
+        padding: 4px 6px;
+        border: 1px solid rgba(212, 165, 55, 0.4);
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.06);
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+        font: inherit;
+      }
+      #lab-panel button:hover {
+        background: rgba(212, 165, 55, 0.25);
+      }
+      #lab-panel .hint {
+        margin-top: 8px;
+        font-size: 10px;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="fake-scene"><div class="floor"></div></div>
+    </div>
+    <div id="lab">
+      <button id="lab-toggle" type="button">UI LAB</button>
+      <div id="lab-panel"></div>
+    </div>
+    <script type="module" src="/src/ui/lab.ts"></script>
+  </body>
+</html>

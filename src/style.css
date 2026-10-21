@@ -1,0 +1,33 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #f6e7e4;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+#app.duchesse-root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.duchesse-root .game-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.duchesse-root .game-layer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.duchesse-root .ui-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}

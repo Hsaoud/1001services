@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Labo des salons — La Duchesse</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #1c181f;
+        color: #eee4ea;
+        font: 13px/1.4 system-ui, sans-serif;
+      }
+      body {
+        display: flex;
+      }
+      #side {
+        width: 330px;
+        flex: none;
+        padding: 12px;
+        box-sizing: border-box;
+        overflow: auto;
+        background: #29222d;
+        border-right: 1px solid #3d3342;
+      }
+      #view {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+      }
+      h1 {
+        font-size: 16px;
+        margin: 0 0 10px;
+        color: #f3c6d2;
+      }
+      label {
+        display: block;
+        margin: 4px 0;
+      }
+      input[type='number'] {
+        width: 110px;
+      }
+      input[type='range'] {
+        width: 100%;
+      }
+      button {
+        margin: 2px 2px 2px 0;
+      }
+      .row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .muted {
+        color: #a99aa6;
+      }
+      .err {
+        color: #ff8f8f;
+      }
+      .ok {
+        color: #9fe0a5;
+      }
+      pre {
+        font-size: 10px;
+        line-height: 1.05;
+        white-space: pre;
+        overflow: auto;
+        background: #1c181f;
+        padding: 6px;
+      }
+      ul {
+        padding-left: 18px;
+        margin: 4px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="side"></div>
+    <div id="view"><canvas id="cv"></canvas></div>
+    <script type="module" src="/src/gen/lab.ts"></script>
+  </body>
+</html>
