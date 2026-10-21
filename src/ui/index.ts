@@ -14,6 +14,7 @@ import './hud.css';
 import './menus.css';
 import './service.css';
 import './touch.css';
+import './readability.css';
 
 import type {
   BubbleState,

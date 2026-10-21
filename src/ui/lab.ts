@@ -17,7 +17,7 @@ import type {
   Settings,
 } from '../types';
 import { CELL } from '../types';
-import { ITEM_TYPES, WHEEL, computeStats, isUpgrade, makeItem } from '../data/items';
+import { ITEM_TYPES, RING_INFO, WHEEL, computeStats, isUpgrade, makeItem } from '../data/items';
 import { BIOME_NAMES, levelPlan } from '../data/progression';
 import type { LootFlow } from './api';
 import { UI } from './index';
@@ -504,7 +504,8 @@ const groups: [string, [string, () => void][]][] = [
         setTimeout(() => ui.toast('Pourboire royal : +250', 'gold'), 900);
         setTimeout(() => ui.toast('Mocassins en Velours niv. 24 équipés', 'item'), 1200);
       }],
-      ['Annonce or', () => ui.announce('Score atteint !', 'Sonnez la Cloche Royale', 'gold')],
+      ['Annonce or', () => ui.announce('Score de Service atteint !', 'Sonnez la Cloche Royale près de l’entrée', 'gold')],
+      ['Annonce longue', () => ui.announce(RING_INFO.tournee.power, RING_INFO.tournee.description, 'gold')],
       ['Annonce rose', () => ui.announce('La mousse déborde !', 'Dépêchez-vous', 'rose')],
       ['Annonce crème', () => ui.announce('Service !', 'Le salon ouvre ses portes', 'cream')],
       ['Flash photo', () => ui.screenFlash('#ffffff', 0.9)],

@@ -54,7 +54,7 @@
   font-variant-caps: all-small-caps;
   letter-spacing: 0.18em;
   font-weight: 700;
-  font-size: calc(var(--u) * 1.25);
+  font-size: max(12px, calc(var(--u) * 1.25));
   color: var(--gold-4);
 }
 
@@ -82,7 +82,7 @@
 
 .dz-pl-salon {
   font-style: italic;
-  font-size: calc(var(--u) * 1.55);
+  font-size: max(12px, calc(var(--u) * 1.55));
   color: var(--ink-soft);
   white-space: nowrap;
   overflow: hidden;
@@ -96,7 +96,7 @@
   margin-top: calc(var(--u) * 0.4);
   padding-top: calc(var(--u) * 0.4);
   border-top: 1px solid rgba(201, 162, 74, 0.4);
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   color: var(--ink-soft);
   font-variant-numeric: lining-nums;
 }
@@ -130,7 +130,7 @@
 }
 
 .dz-score-head {
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   color: var(--ink-2);
 }
 
@@ -285,13 +285,13 @@
 }
 
 .dz-score-sep {
-  font-size: calc(var(--u) * 1.8);
+  font-size: max(14px, calc(var(--u) * 1.8));
   color: var(--gold-4);
   font-style: italic;
 }
 
 .dz-score-quota {
-  font-size: calc(var(--u) * 1.8);
+  font-size: max(14px, calc(var(--u) * 1.8));
   font-weight: 600;
   color: var(--ink-soft);
 }
@@ -531,13 +531,13 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: calc(var(--u) * 1.25);
+  font-size: max(12px, calc(var(--u) * 1.25));
   color: var(--ink-2);
 }
 
 .dz-tray-count {
   font-weight: 700;
-  font-size: calc(var(--u) * 1.45);
+  font-size: max(12px, calc(var(--u) * 1.45));
   font-variant-numeric: lining-nums;
 }
 
@@ -619,7 +619,7 @@
   display: flex;
   align-items: center;
   gap: calc(var(--u) * 0.5);
-  font-size: calc(var(--u) * 1.25);
+  font-size: max(12px, calc(var(--u) * 1.25));
   color: var(--ink-2);
 }
 
@@ -805,7 +805,7 @@
   left: calc(var(--u) * -0.5);
   min-width: calc(var(--u) * 2);
   height: calc(var(--u) * 2);
-  font-size: calc(var(--u) * 1.15);
+  font-size: max(12px, calc(var(--u) * 1.15));
 }
 
 .dz-ring-time {
@@ -815,7 +815,7 @@
   transform: translateX(-50%);
   padding: 0 calc(var(--u) * 0.55);
   border-radius: 999px;
-  font-size: calc(var(--u) * 1.2);
+  font-size: max(12px, calc(var(--u) * 1.2));
   font-weight: 700;
   font-variant-numeric: lining-nums tabular-nums;
   color: #fff6e6;
@@ -1283,13 +1283,13 @@
 }
 
 .dz-toast-kind {
-  font-size: calc(var(--u) * 1.15);
+  font-size: max(12px, calc(var(--u) * 1.15));
   color: var(--gold-4);
   line-height: 1.1;
 }
 
 .dz-toast-text {
-  font-size: calc(var(--u) * 1.75);
+  font-size: max(14px, calc(var(--u) * 1.75));
   font-weight: 500;
   line-height: 1.25;
 }
@@ -1415,6 +1415,15 @@
   filter: drop-shadow(0 1px 0 rgba(91, 31, 42, 0.55)) drop-shadow(0 0 calc(var(--u) * 0.4) rgba(255, 250, 235, 0.9));
 }
 
+.dz-ann-gold .dz-ann-title {
+  -webkit-text-stroke: clamp(0.45px, 0.012em, 0.9px) rgba(105, 65, 29, 0.8);
+  paint-order: stroke fill;
+  filter:
+    drop-shadow(0 1px 0 rgba(91, 31, 42, 0.6))
+    drop-shadow(0 2px 2px rgba(91, 31, 42, 0.2))
+    drop-shadow(0 0 calc(var(--u) * 0.35) rgba(255, 250, 235, 0.85));
+}
+
 .dz-ann-rose .dz-ann-title {
   background: linear-gradient(180deg, #f1b7c0 0%, #c0606f 55%, #7a2e3a 100%);
   -webkit-background-clip: text;
@@ -1432,7 +1441,7 @@
   font-variant-caps: all-small-caps;
   letter-spacing: 0.2em;
   font-weight: 700;
-  font-size: calc(var(--u) * 2.1);
+  font-size: max(14px, calc(var(--u) * 2.1));
   color: var(--ink);
 }
 
@@ -1486,7 +1495,7 @@
 }
 
 .dz-mm-title {
-  font-size: calc(var(--u) * 1.15);
+  font-size: max(12px, calc(var(--u) * 1.15));
   color: var(--gold-4);
 }
 
@@ -1503,7 +1512,7 @@
 
 .dz-mm-hint {
   margin-top: calc(var(--u) * -0.8);
-  font-size: calc(var(--u) * 1.1);
+  font-size: max(12px, calc(var(--u) * 1.1));
   font-style: italic;
   color: var(--ink-faint);
 }
@@ -1511,7 +1520,7 @@
 .dz-mm-hint .dz-key {
   height: calc(var(--u) * 1.8);
   min-width: calc(var(--u) * 2.6);
-  font-size: calc(var(--u) * 1);
+  font-size: max(12px, calc(var(--u) * 1));
 }
 
 .dz-minimap.dz-expanded {
@@ -1532,7 +1541,7 @@
 }
 
 .dz-expanded .dz-mm-title {
-  font-size: calc(var(--u) * 1.9);
+  font-size: max(14px, calc(var(--u) * 1.9));
 }
 
 .dz-expanded .dz-mm-canvas {
@@ -1545,7 +1554,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: calc(var(--u) * 0.6) calc(var(--u) * 1.6);
-  font-size: calc(var(--u) * 1.35);
+  font-size: max(12px, calc(var(--u) * 1.35));
   color: var(--ink-soft);
 }
 
@@ -1603,7 +1612,7 @@
 
 .dz-expanded .dz-mm-hint {
   margin-top: calc(var(--u) * 0.6);
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
 }
 
 /* Pas de point résiduel (extrémité arrondie) sur les arcs vides. */

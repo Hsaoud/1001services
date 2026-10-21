@@ -560,6 +560,42 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* Reserve room for the seal overhanging the receipt's bottom-right corner. */
+:root[data-input='touch'] .dz-bill-wrap {
+  width: min(calc(var(--u) * 44 + 24px), 100%);
+  padding: 8px 12px 12px;
+  justify-content: flex-start;
+  overflow-x: hidden;
+}
+
+:root[data-input='touch'] .dz-bill-shadow {
+  flex: none;
+  width: 100%;
+  transform: none;
+}
+
+:root[data-input='touch'] .dz-bill { width: 100%; max-width: 100%; }
+:root[data-input='touch'] .dz-bill-actions { flex: none; }
+
+:root[data-input='touch'] .dz-results-success .dz-bill-wrap {
+  width: min(calc(var(--u) * 56 + 24px), 100%);
+}
+
+:root[data-input='touch'] .dz-results-success .dz-bill-shadow {
+  padding: 0 calc(var(--u) * 12) calc(var(--u) * 8) 0;
+}
+
+:root[data-input='touch'] .dz-bill-stamp {
+  right: calc(var(--u) * 5.2);
+  bottom: calc(var(--u) * 3.6);
+  animation-name: dz-stamp-touch;
+}
+
+@keyframes dz-stamp-touch {
+  from { opacity: 0; transform: rotate(-14deg) scale(1.15); }
+  to { opacity: 1; transform: rotate(-14deg) scale(1); }
+}
+
 :root[data-input='touch'] :is(.dz-wr-card, .dz-ls-card) {
   width: 100%;
   height: 100%;
@@ -661,9 +697,6 @@
   :root[data-input='touch'] .dz-intro-card { width: min(480px, 100%); flex: 1; flex-shrink: 0; }
   :root[data-input='touch'] .dz-novelty { width: 260px; flex: none; }
   :root[data-input='touch'] :is(.dz-intro-goal, .dz-nov-text, .dz-nov-tip p) { font-size: 14px; }
-  :root[data-input='touch'] .dz-bill-wrap { justify-content: flex-start; }
-  :root[data-input='touch'] .dz-bill-shadow { flex: none; transform: none; }
-  :root[data-input='touch'] .dz-bill-actions { flex: none; }
   :root[data-input='touch'] .dz-loot-stage > * { flex-shrink: 0; }
   :root[data-input='touch'] .dz-loot-main { min-height: 250px; }
   :root[data-input='touch'] .dz-wheel { width: min(44vmin, 260px); height: min(44vmin, 260px); }

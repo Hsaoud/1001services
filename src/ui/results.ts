@@ -22,7 +22,7 @@ export function showResultsCard(ctx: UiCtx, r: ServiceResult): Promise<void> {
   const hour = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   const verdict = r.success ? (ratio >= 1.5 ? 'Service d’exception' : ratio >= 1.2 ? 'Service remarquable' : 'Service réussi') : 'Service manqué';
 
-  const el = html(`<div class="dz-results">
+  const el = html(`<div class="dz-results${r.success ? ' dz-results-success' : ''}">
     <div class="dz-backdrop"></div>
     <div class="dz-bill-wrap">
       <div class="dz-bill-shadow"><article class="dz-bill ${r.success ? 'dz-success' : 'dz-fail'}">

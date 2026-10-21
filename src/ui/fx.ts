@@ -103,6 +103,8 @@ export class Announce {
   constructor() {
     this.el = document.createElement('div');
     this.el.className = 'dz-announce';
+    this.el.setAttribute('role', 'status');
+    this.el.setAttribute('aria-live', 'polite');
   }
 
   show(title: string, subtitle?: string, tone: 'gold' | 'rose' | 'cream' = 'gold'): void {
@@ -118,7 +120,7 @@ export class Announce {
     this.timer = window.setTimeout(() => {
       b.classList.add('dz-leaving');
       setTimeout(() => b.remove(), 600);
-    }, 2600);
+    }, Math.min(8000, Math.max(3200, (title.length + (subtitle?.length ?? 0)) * 55)));
   }
 }
 

@@ -71,7 +71,7 @@
 }
 
 .dz-title-pre {
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   color: var(--gold-4);
   letter-spacing: 0.32em;
 }
@@ -103,7 +103,9 @@
 .dz-t-script {
   font-size: calc(var(--u) * 6.4);
   margin-top: calc(var(--u) * -0.8);
-  padding: 0 0.25em 0.12em;
+  /* Great Vibes capitals rise above the em box: include them in the gold fill. */
+  padding: 0.2em 0.25em 0.15em;
+  line-height: 1.15;
   white-space: nowrap;
   background: linear-gradient(100deg, #b8862c 0%, #e9cf87 22%, #c9a24a 38%, #f7e4a6 50%, #b8862c 66%, #d4a537 82%, #a8792a 100%);
   background-size: 220% 100%;
@@ -118,7 +120,7 @@
   max-width: calc(var(--u) * 36);
   margin-top: calc(var(--u) * 0.6);
   font-style: italic;
-  font-size: calc(var(--u) * 1.65);
+  font-size: max(12px, calc(var(--u) * 1.65));
   line-height: 1.35;
   text-align: center;
   color: var(--ink-soft);
@@ -218,7 +220,7 @@
 }
 
 .dz-mi-sub .dz-mi-name {
-  font-size: calc(var(--u) * 2);
+  font-size: max(14px, calc(var(--u) * 2));
   font-weight: 500;
 }
 
@@ -231,7 +233,7 @@
 
 .dz-mi-price {
   font-style: italic;
-  font-size: calc(var(--u) * 1.8);
+  font-size: max(14px, calc(var(--u) * 1.8));
   white-space: nowrap;
   color: var(--ink-2);
   font-variant-numeric: lining-nums;
@@ -240,7 +242,7 @@
 .dz-mi-desc {
   padding-left: calc(var(--u) * 2.9);
   font-style: italic;
-  font-size: calc(var(--u) * 1.5);
+  font-size: max(12px, calc(var(--u) * 1.5));
   color: var(--ink-soft);
 }
 
@@ -258,7 +260,7 @@
   gap: calc(var(--u) * 0.8);
   margin-top: calc(var(--u) * 0.25);
   padding-left: calc(var(--u) * 2.9);
-  font-size: calc(var(--u) * 1.25);
+  font-size: max(12px, calc(var(--u) * 1.25));
   color: var(--ink-faint);
   font-variant-numeric: lining-nums;
 }
@@ -292,13 +294,13 @@
 }
 
 .dz-mi-sep-t {
-  font-size: calc(var(--u) * 2);
+  font-size: max(14px, calc(var(--u) * 2));
   color: var(--gold-4);
   line-height: 1;
 }
 
 .dz-modechip {
-  font-size: calc(var(--u) * 1.35);
+  font-size: max(12px, calc(var(--u) * 1.35));
   align-self: center;
 }
 
@@ -346,7 +348,7 @@
   margin-top: auto;
   padding-top: calc(var(--u) * 1.4);
   text-align: center;
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   color: var(--ink-faint);
 }
 
@@ -363,7 +365,7 @@
 .dz-pause-keys .dz-key {
   min-width: calc(var(--u) * 2);
   height: calc(var(--u) * 2);
-  font-size: calc(var(--u) * 1.1);
+  font-size: max(12px, calc(var(--u) * 1.1));
 }
 
 .dz-title-credit em {
@@ -410,7 +412,7 @@
   gap: calc(var(--u) * 0.5);
   padding: calc(var(--u) * 0.35) calc(var(--u) * 1.5);
   border-radius: 999px;
-  font-size: calc(var(--u) * 1.65);
+  font-size: max(12px, calc(var(--u) * 1.65));
   font-weight: 600;
   font-variant-caps: all-small-caps;
   letter-spacing: 0.1em;
@@ -449,13 +451,13 @@
 }
 
 .dz-ls-sub {
-  font-size: calc(var(--u) * 1.8);
+  font-size: max(14px, calc(var(--u) * 1.8));
   color: var(--ink-2);
 }
 
 .dz-ls-progress {
   margin-top: calc(var(--u) * 0.3);
-  font-size: calc(var(--u) * 1.35);
+  font-size: max(12px, calc(var(--u) * 1.35));
   font-style: italic;
   color: var(--ink-faint);
 }
@@ -538,20 +540,20 @@
 
 .dz-chap-num {
   grid-area: num;
-  font-size: calc(var(--u) * 1.15);
+  font-size: max(12px, calc(var(--u) * 1.15));
   color: var(--gold-4);
 }
 
 .dz-chap-name {
   grid-area: name;
-  font-size: calc(var(--u) * 1.75);
+  font-size: max(14px, calc(var(--u) * 1.75));
   font-weight: 600;
   line-height: 1.1;
 }
 
 .dz-chap-range {
   grid-area: range;
-  font-size: calc(var(--u) * 1.25);
+  font-size: max(12px, calc(var(--u) * 1.25));
   font-style: italic;
   color: var(--ink-faint);
 }
@@ -581,7 +583,7 @@
 }
 
 .dz-lv-no {
-  font-size: calc(var(--u) * 1.75);
+  font-size: max(14px, calc(var(--u) * 1.75));
   font-weight: 600;
   white-space: nowrap;
   font-variant-numeric: lining-nums;
@@ -602,7 +604,7 @@
   display: inline-flex;
   align-items: center;
   gap: calc(var(--u) * 0.3);
-  font-size: calc(var(--u) * 1.55);
+  font-size: max(12px, calc(var(--u) * 1.55));
   font-variant-numeric: lining-nums;
   color: var(--ink-2);
 }
@@ -617,7 +619,7 @@
   align-items: center;
   gap: calc(var(--u) * 0.35);
   padding-left: calc(var(--u) * 0.2);
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   font-style: italic;
   line-height: 1.2;
   color: var(--rose-4);
@@ -693,7 +695,7 @@
   align-items: center;
   gap: calc(var(--u) * 0.6);
   font-style: italic;
-  font-size: calc(var(--u) * 1.5);
+  font-size: max(12px, calc(var(--u) * 1.5));
   color: var(--ink-soft);
 }
 
@@ -732,13 +734,13 @@
   font-variant-caps: all-small-caps;
   letter-spacing: 0.14em;
   font-weight: 700;
-  font-size: calc(var(--u) * 1.2);
+  font-size: max(12px, calc(var(--u) * 1.2));
   color: var(--gold-4);
 }
 
 .dz-det-facts dd {
   margin: 0;
-  font-size: calc(var(--u) * 2);
+  font-size: max(14px, calc(var(--u) * 2));
   font-weight: 600;
   font-variant-numeric: lining-nums;
 }
@@ -757,7 +759,7 @@
 
 .dz-det-menu-h {
   margin-top: calc(var(--u) * 1.2);
-  font-size: calc(var(--u) * 1.2);
+  font-size: max(12px, calc(var(--u) * 1.2));
   color: var(--gold-4);
 }
 
@@ -788,7 +790,7 @@
   font-variant-caps: all-small-caps;
   letter-spacing: 0.14em;
   font-weight: 700;
-  font-size: calc(var(--u) * 1.2);
+  font-size: max(12px, calc(var(--u) * 1.2));
   color: var(--rose-4);
 }
 
@@ -797,14 +799,14 @@
 }
 
 .dz-det-note-t {
-  font-size: calc(var(--u) * 1.9);
+  font-size: max(14px, calc(var(--u) * 1.9));
   font-weight: 600;
   line-height: 1.15;
 }
 
 .dz-det-note p {
   margin-top: calc(var(--u) * 0.3);
-  font-size: calc(var(--u) * 1.45);
+  font-size: max(12px, calc(var(--u) * 1.45));
   font-style: italic;
   line-height: 1.3;
   color: var(--ink-soft);
@@ -816,7 +818,7 @@
   gap: calc(var(--u) * 0.5);
   margin-top: calc(var(--u) * 1.2);
   font-style: italic;
-  font-size: calc(var(--u) * 1.4);
+  font-size: max(12px, calc(var(--u) * 1.4));
   color: var(--ink-faint);
 }
 
@@ -837,7 +839,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: calc(var(--u) * 0.3);
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   font-style: italic;
   color: var(--ink-faint);
 }
@@ -910,7 +912,7 @@
 .dz-wr-caption {
   position: absolute;
   bottom: calc(var(--u) * -0.8);
-  font-size: calc(var(--u) * 1.15);
+  font-size: max(12px, calc(var(--u) * 1.15));
   letter-spacing: 0.16em;
   font-weight: 700;
   color: var(--gold-4);
@@ -933,7 +935,7 @@
   align-items: center;
   gap: calc(var(--u) * 1);
   margin-bottom: calc(var(--u) * 0.6);
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   color: var(--gold-4);
 }
 
@@ -1000,18 +1002,18 @@
 }
 
 .dz-ws-slot {
-  font-size: calc(var(--u) * 1.1);
+  font-size: max(12px, calc(var(--u) * 1.1));
   color: var(--gold-4);
 }
 
 .dz-ws-name {
-  font-size: calc(var(--u) * 1.6);
+  font-size: max(12px, calc(var(--u) * 1.6));
   font-weight: 600;
   line-height: 1.12;
 }
 
 .dz-ws-lvl {
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   font-style: italic;
   color: var(--ink-soft);
 }
@@ -1048,7 +1050,7 @@
 }
 
 .dz-wslot.dz-compact .dz-ws-name {
-  font-size: calc(var(--u) * 1.35);
+  font-size: max(12px, calc(var(--u) * 1.35));
 }
 
 .dz-wr-side {
@@ -1071,7 +1073,7 @@
 }
 
 .dz-wd-slot {
-  font-size: calc(var(--u) * 1.2);
+  font-size: max(12px, calc(var(--u) * 1.2));
   color: var(--gold-4);
 }
 
@@ -1080,19 +1082,19 @@
 }
 
 .dz-wd-name {
-  font-size: calc(var(--u) * 2.1);
+  font-size: max(14px, calc(var(--u) * 2.1));
   font-weight: 600;
   line-height: 1.15;
 }
 
 .dz-wd-stat {
   margin-top: calc(var(--u) * 0.2);
-  font-size: calc(var(--u) * 1.55);
+  font-size: max(12px, calc(var(--u) * 1.55));
 }
 
 .dz-wd p {
   margin-top: calc(var(--u) * 0.4);
-  font-size: calc(var(--u) * 1.4);
+  font-size: max(12px, calc(var(--u) * 1.4));
   font-style: italic;
   line-height: 1.3;
   color: var(--ink-soft);
@@ -1103,12 +1105,12 @@
   align-items: center;
   gap: calc(var(--u) * 0.5);
   margin-top: calc(var(--u) * 0.5);
-  font-size: calc(var(--u) * 1.4);
+  font-size: max(12px, calc(var(--u) * 1.4));
   font-weight: 600;
 }
 
 .dz-wr-stats-h {
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   color: var(--gold-4);
   padding-bottom: calc(var(--u) * 0.3);
   border-bottom: 1px solid rgba(201, 162, 74, 0.5);
@@ -1129,13 +1131,13 @@
   align-items: baseline;
   gap: calc(var(--u) * 0.5);
   padding: calc(var(--u) * 0.18) 0;
-  font-size: calc(var(--u) * 1.55);
+  font-size: max(12px, calc(var(--u) * 1.55));
 }
 
 .dz-wr-list .dz-key {
   min-width: calc(var(--u) * 1.9);
   height: calc(var(--u) * 1.9);
-  font-size: calc(var(--u) * 1.05);
+  font-size: max(12px, calc(var(--u) * 1.05));
   align-self: center;
 }
 
@@ -1199,7 +1201,7 @@
   margin: 0 0 calc(var(--u) * 0.6);
   padding-bottom: calc(var(--u) * 0.3);
   border-bottom: 1px solid rgba(201, 162, 74, 0.5);
-  font-size: calc(var(--u) * 1.5);
+  font-size: max(12px, calc(var(--u) * 1.5));
   color: var(--gold-4);
 }
 
@@ -1212,13 +1214,13 @@
 }
 
 .dz-set-label {
-  font-size: calc(var(--u) * 1.75);
+  font-size: max(14px, calc(var(--u) * 1.75));
 }
 
 .dz-set-val {
   text-align: right;
   font-style: italic;
-  font-size: calc(var(--u) * 1.6);
+  font-size: max(12px, calc(var(--u) * 1.6));
   color: var(--ink-2);
   font-variant-numeric: lining-nums tabular-nums;
 }
@@ -1236,7 +1238,7 @@
 .dz-seg-b {
   padding: calc(var(--u) * 0.35) calc(var(--u) * 1.4);
   border-radius: 999px;
-  font-size: calc(var(--u) * 1.6);
+  font-size: max(12px, calc(var(--u) * 1.6));
   font-weight: 600;
   font-variant-caps: all-small-caps;
   letter-spacing: 0.1em;
@@ -1306,7 +1308,7 @@
   top: 50%;
   right: calc(var(--u) * 1);
   transform: translateY(-50%);
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   font-variant-caps: all-small-caps;
   letter-spacing: 0.1em;
   font-weight: 700;
@@ -1343,17 +1345,17 @@
 .dz-ctrl-k .dz-key {
   min-width: calc(var(--u) * 2.2);
   height: calc(var(--u) * 2.2);
-  font-size: calc(var(--u) * 1.2);
+  font-size: max(12px, calc(var(--u) * 1.2));
 }
 
 .dz-ctrl-k em {
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   color: var(--ink-faint);
   margin: 0 calc(var(--u) * 0.2);
 }
 
 .dz-ctrl-d {
-  font-size: calc(var(--u) * 1.55);
+  font-size: max(12px, calc(var(--u) * 1.55));
   font-style: italic;
   color: var(--ink-soft);
 }
@@ -1377,7 +1379,7 @@
   padding: calc(var(--u) * 0.2) calc(var(--u) * 0.75);
   font-family: var(--serif);
   font-weight: 700;
-  font-size: calc(var(--u) * 1.25);
+  font-size: max(12px, calc(var(--u) * 1.25));
   line-height: 1;
   color: var(--ink);
   background: linear-gradient(180deg, #fffdf8, #f1e3cf);
@@ -1432,7 +1434,7 @@
 
 .dz-pause-keys {
   margin-top: calc(var(--u) * 1.4);
-  font-size: calc(var(--u) * 1.3);
+  font-size: max(12px, calc(var(--u) * 1.3));
   font-style: italic;
   color: var(--ink-faint);
 }

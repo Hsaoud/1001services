@@ -9,6 +9,7 @@
  *   Entrée / E / Espace : valider. Échap / Retour arrière : revenir.
  */
 import { audio } from '../audio';
+import { device } from '../core/device';
 import { leave } from './dom';
 
 export interface Screen {
@@ -168,7 +169,8 @@ export class ScreenStack {
     if (document.activeElement !== want) want.focus({ preventScroll: true });
     this.cur = this.cur === want ? null : this.cur;
     this.mark(want);
-    scrollIntoViewIfNeeded(want);
+    // Touch readers start at the heading; keyboard users need the selected control in view.
+    if (device.mode !== 'touch' || want.closest('.dz-ls-scroll')) scrollIntoViewIfNeeded(want);
   }
 
   private inTop(el: Element): boolean {
@@ -233,16 +235,16 @@ export class ScreenStack {
     this.focusEl(n);
   }
 
-  private focusEl(n: HTMLElement, sound = true): void {
+  private focusEl(n: HTMLElement, sound = true, reveal = true): void {
     n.focus({ preventScroll: true });
     this.mark(n);
-    scrollIntoViewIfNeeded(n);
+    if (reveal) scrollIntoViewIfNeeded(n);
     if (sound) audio.sfx('ui_hover');
   }
 
   /** Sélectionne un élément de l'écran du dessus (sans son). */
   select(n: HTMLElement): void {
-    if (this.inTop(n)) this.focusEl(n, false);
+    if (this.inTop(n)) this.focusEl(n, false, device.mode !== 'touch');
   }
 
   /** Navigation spatiale : élément le plus proche dans la direction demandée. */

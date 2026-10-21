@@ -1,0 +1,114 @@
+/* Legible ink on parchment; the decorative gold palette stays on the ornaments. */
+.dz-root :is(.dz-title-pre, .dz-h-eyebrow, .dz-mi-desc em, .dz-modechip b, .dz-ls-progress em,
+  .dz-chap-num, .dz-det-facts dt, .dz-intro-facts dt, .dz-det-menu-h,
+  .dz-ws-slot, .dz-wd-slot, .dz-wr-stats-h, .dz-set-h, .dz-set-val, .dz-bill-addr, .dz-item-slot,
+  .dz-mm-title, .dz-pl-mode, .dz-toast-kind, .dz-finale-badge) {
+  color: var(--text-gold);
+}
+
+.dz-root :is(.dz-nov-cat, .dz-det-note-h, .dz-intro-salon, .dz-toast-intro .dz-toast-kind,
+  .dz-mode-cdf .dz-pl-mode, .dz-ws-h, .dz-finale-sign) {
+  color: var(--text-rose);
+}
+
+/* A fine engraved edge keeps the metallic fill legible over light and busy scenes. */
+.dz-root :is(.dz-t-script, .dz-gold-text, .dz-finale-title .dz-script,
+  .dz-cd-num, .dz-cd-word, .dz-pop-gold span, .dz-combo-v, .dz-score-hint .dz-script) {
+  -webkit-text-stroke: clamp(0.4px, 0.01em, 0.8px) rgba(105, 65, 29, 0.8);
+  paint-order: stroke fill;
+}
+
+.dz-ann {
+  max-width: 100%;
+  padding-inline: min(calc(var(--u) * 10), 4vw);
+  text-align: center;
+}
+
+.dz-ann-title {
+  max-width: 100%;
+  padding: 0.18em 0.3em 0.1em;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.dz-ann-sub {
+  max-width: 100%;
+  line-height: 1.35;
+  letter-spacing: 0.12em;
+  text-wrap: pretty;
+}
+
+.dz-ann-rose .dz-ann-title {
+  -webkit-text-stroke: clamp(0.4px, 0.01em, 0.8px) rgba(91, 31, 42, 0.7);
+  paint-order: stroke fill;
+}
+
+.dz-finale-title .dz-script { padding-top: 0.2em; line-height: 1.2; }
+.dz-lv.dz-locked { opacity: 0.75; }
+.dz-root :is(.dz-intro-facts dd small, .dz-det-facts dd small, .dz-det-facts dd em) { font-size: 12px; }
+.dz-btn { font-size: max(16px, calc(var(--u) * 1.9)); }
+.dz-tab { font-size: max(14px, calc(var(--u) * 1.65)); }
+.dz-key { font-size: max(12px, calc(var(--u) * 1.3)); }
+
+.dz-root :is(.dz-dim, .dz-cmp-was, .dz-cmp small) { font-size: max(12px, calc(var(--u) * 1.35)); }
+.dz-item-tier { color: #301721; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4); }
+.dz-cmp.dz-up, .dz-equipped .dz-item-stamp { color: #365b40; }
+.dz-root :is(.dz-item-stat, .dz-item-cmp, .dz-wheel-side p, .dz-ws-odds li,
+  .dz-bill-meta, .dz-fail-stats, .dz-ctrl-d) {
+  font-size: max(14px, calc(var(--u) * 1.55));
+  line-height: 1.4;
+}
+
+.dz-ann-rule { max-width: 80%; }
+.dz-loot .dz-h-eyebrow {
+  color: var(--ink-2);
+  font-size: max(14px, calc(var(--u) * 1.5));
+  text-shadow: 0 1px 1px rgba(251, 243, 232, 0.95);
+}
+.dz-toast-body { min-width: 0; }
+.dz-toast-text { overflow-wrap: break-word; }
+
+/* Rotating rays are decoration; they must not create a sideways scroll area. */
+.dz-loot-main { overflow: clip; padding-block: 12px; }
+:root[data-input='touch'] .dz-loot-stage { overflow-x: hidden; }
+
+:root[data-input='touch'] .dz-tbtn-label { font-size: max(12px, calc(var(--tb) * 0.17)); }
+:root[data-input='touch'] .dz-tbtn-act.is-idle { opacity: 0.85; }
+:root[data-input='touch'] .dz-tbtn-dash.is-empty { opacity: 0.8; }
+:root[data-input='touch'] .dz-root :is(.dz-mi-price, .dz-mi-meta, .dz-title-credit,
+  .dz-title-pre, .dz-ws-slot, .dz-modechip, .dz-score-head, .dz-pl-no) { font-size: 12px; }
+:root[data-input='touch'] .dz-h-eyebrow { font-size: 14px; letter-spacing: 0.16em; }
+:root[data-input='touch'] .dz-root :is(.dz-mi-desc, .dz-score-quota) { font-size: 14px; }
+:root[data-input='touch'] .dz-root :is(.dz-bill-lines li, .dz-nov-tip p,
+  .dz-intro-goal, .dz-nov-text, .dz-toast-text) { font-size: max(14px, calc(var(--u) * 1.8)); line-height: 1.4; }
+:root[data-input='touch'] .dz-mm-title { letter-spacing: 0.08em; }
+:root[data-input='touch'] .dz-meter-head { font-size: max(12px, calc(var(--u) * 1.25)); }
+
+@media (max-height: 600px) and (orientation: landscape) {
+  :root[data-input='touch'] .dz-hud-bl { left: 40%; }
+  :root[data-input='touch'] .dz-novelty { width: 100%; max-width: 100%; transform: none; }
+  :root[data-input='touch'] .dz-intro-wrap {
+    display: block;
+    width: min(520px, 100%);
+    align-items: start;
+  }
+  :root[data-input='touch'] .dz-intro-wrap.dz-has-novelty {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    width: min(800px, 100%);
+  }
+  :root[data-input='touch'] .dz-intro-card { width: 100%; min-width: 0; }
+  :root[data-input='touch'] .dz-plaque { min-width: 100px; }
+  :root[data-input='touch'] .dz-pl-mode { letter-spacing: 0.08em; }
+  :root[data-input='touch'] .dz-hud-tr { top: 10px; }
+  :root[data-input='touch'] .dz-loot-main { min-height: 320px; }
+}
+
+@media (max-width: 700px) and (orientation: landscape) {
+  :root[data-input='touch'] .dz-intro-wrap,
+  :root[data-input='touch'] .dz-intro-wrap.dz-has-novelty { display: block; }
+  :root[data-input='touch'] .dz-novelty { width: 100%; }
+  :root[data-input='touch'] .dz-ann-title { font-size: 40px; }
+  :root[data-input='touch'] .dz-ann-sub { font-size: 14px; }
+}
