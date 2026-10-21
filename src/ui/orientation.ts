@@ -1,21 +1,28 @@
 /**
- * Garde d'orientation : force le mode paysage sur Android et iPhone / iPad.
+ * Garde d'orientation : le service nécessite un viewport paysage.
  * - Sur Android : tente le verrouillage matériel via screen.orientation.lock('landscape').
  * - Sur iPhone / iOS Safari (où l'API de verrouillage est bloquée par le navigateur) et en mode portrait :
  *   affiche un écran d'invitation au pivotement avec animation, bloquant les contrôles
  *   jusqu'à ce que l'appareil soit tourné à l'horizontale.
  */
-import { collapseMobileBars, enterFullscreen, forceLandscapeAndFullscreen, isFullscreen, isPortrait, isTouchDevice, lockLandscape } from '../core/device';
+import { forceLandscapeAndFullscreen, fullscreenAvailable, isHandheld, isIOS, isPortrait, syncViewport } from '../core/device';
 
 export class OrientationGuard {
   readonly el: HTMLElement;
   private onPortraitChange?: (inPortrait: boolean) => void;
   private active = false;
+  private settleTimer = 0;
+  private previousFocus: HTMLElement | null = null;
 
   constructor() {
     this.el = document.createElement('div');
     this.el.className = 'dz-orientation-guard dz-off';
     this.el.setAttribute('aria-live', 'polite');
+    this.el.setAttribute('role', 'alertdialog');
+    this.el.setAttribute('aria-modal', 'true');
+    this.el.setAttribute('aria-label', 'Tournez votre appareil en paysage');
+    const orientation = window.screen?.orientation as (ScreenOrientation & { lock?: unknown }) | undefined;
+    const nativeRotation = fullscreenAvailable() && typeof orientation?.lock === 'function';
 
     this.el.innerHTML = `
       <div class="dz-og-card dz-paper">
@@ -36,8 +43,9 @@ export class OrientationGuard {
         <p class="dz-og-desc">
           Pour servir avec toute l'élégance requise à La Duchesse, veuillez faire pivoter votre appareil à l'horizontale.
         </p>
+        ${isIOS() ? '<p class="dz-og-help">Si l’écran ne pivote pas, désactivez le verrouillage de rotation dans le Centre de contrôle de votre iPhone ou iPad.</p>' : ''}
         <button type="button" class="dz-btn dz-btn-gold dz-og-lockbtn">
-          <span class="dz-btn-txt">Tourner en Paysage</span>
+          <span class="dz-btn-txt">${nativeRotation ? 'Activer le paysage' : 'Vérifier l’orientation'}</span>
         </button>
       </div>
     `;
@@ -45,64 +53,54 @@ export class OrientationGuard {
     const btn = this.el.querySelector('.dz-og-lockbtn') as HTMLButtonElement | null;
     btn?.addEventListener('click', async (e) => {
       e.stopPropagation();
-      await forceLandscapeAndFullscreen();
+      if (nativeRotation) await forceLandscapeAndFullscreen();
+      this.check();
     });
 
-    // Toucher sur l'écran d'orientation pour forcer le verrouillage paysage et plein écran
-    this.el.addEventListener('click', async (e) => {
-      if ((e.target as HTMLElement).closest('.dz-og-lockbtn')) return;
-      await forceLandscapeAndFullscreen();
-    });
-
-    // Écoute des changements d'orientation et redimensionnement
-    const check = () => this.check();
+    // iOS can fire orientationchange before resizing the page. Recheck after layout settles.
+    const check = () => {
+      this.check();
+      requestAnimationFrame(() => this.check());
+      window.clearTimeout(this.settleTimer);
+      this.settleTimer = window.setTimeout(() => this.check(), 300);
+    };
     window.addEventListener('resize', check);
     window.addEventListener('orientationchange', check);
+    window.visualViewport?.addEventListener('resize', check);
+    window.matchMedia?.('(orientation: portrait)').addEventListener?.('change', check);
+    window.addEventListener('pageshow', check);
+    document.addEventListener('visibilitychange', check);
     if (typeof screen !== 'undefined' && screen.orientation) {
-      screen.orientation.addEventListener('change', check);
+      screen.orientation.addEventListener?.('change', check);
     }
-
-    // Sur mobile en paysage, forcer le plein écran dès le premier geste tactile valide (click / touchend)
-    const tryFullscreenOnTouch = () => {
-      if (!isPortrait() && isTouchDevice()) {
-        if (!isFullscreen()) {
-          void enterFullscreen();
-        } else {
-          collapseMobileBars();
-        }
-      }
-    };
-    window.addEventListener('click', tryFullscreenOnTouch, { capture: true, passive: true });
-    window.addEventListener('touchend', tryFullscreenOnTouch, { capture: true, passive: true });
 
     this.check();
   }
 
   setCallback(fn: (inPortrait: boolean) => void): void {
     this.onPortraitChange = fn;
+    fn(this.active);
+    if (this.active) this.el.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
   }
 
   check(): boolean {
     if (typeof window === 'undefined') return false;
-    const touch = isTouchDevice();
+    syncViewport();
+    const touch = isHandheld();
     const portrait = isPortrait();
     // Sur desktop, une fenêtre haute et étroite n'est pas un smartphone, sauf si forcée par ?input=touch
     const shouldBlock = touch && portrait;
 
     if (shouldBlock !== this.active) {
-      const wasActive = this.active;
+      if (shouldBlock) this.previousFocus = document.activeElement as HTMLElement | null;
       this.active = shouldBlock;
       this.el.classList.toggle('dz-off', !shouldBlock);
       this.el.classList.toggle('is-visible', shouldBlock);
-      if (shouldBlock) {
-        void lockLandscape();
-      } else if (wasActive && touch) {
-        // Sortie du mode portrait -> passage en paysage : replier immédiatement l'en-tête du navigateur
-        collapseMobileBars();
-        void lockLandscape();
-      }
       this.onPortraitChange?.(shouldBlock);
+      if (shouldBlock) this.el.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
+      else if (this.previousFocus?.isConnected) this.previousFocus.focus({ preventScroll: true });
     }
+    this.el.setAttribute('aria-hidden', String(!shouldBlock));
     return shouldBlock;
   }
 }

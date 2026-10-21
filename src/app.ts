@@ -14,7 +14,7 @@ import { generateSalon } from './gen';
 import { levelPlan, BIOME_NAMES, LEVEL_COUNT } from './data/progression';
 import { WHEEL, computeStats, isUpgrade, makeItem, rollItemType } from './data/items';
 import { World, type FrameInput } from './game/world';
-import { device, lockLandscape } from './core/device';
+import { device, isHandheld, isPortrait } from './core/device';
 import type { GameMode, Item, ItemType, SalonLayout, SaveData, Settings } from './types';
 
 type AppState = 'title' | 'menu' | 'intro' | 'playing' | 'paused' | 'end';
@@ -41,13 +41,13 @@ export class App {
     root.append(gameLayer, uiLayer);
 
     this.save = loadSave();
+    device.init();
     this.renderer = new GameRenderer(gameLayer);
     this.ui = new UI(uiLayer);
     this.ui.setDishIconProvider((id) => this.renderer.dishIcon(id));
     this.ui.setDuchessPortraitProvider?.(() => this.renderer.duchessPortrait?.() ?? '');
     this.applySettings(this.save.settings);
 
-    device.init();
     this.ui.attachTouchInput?.(this.input);
     this.ui.onOrientationChange?.((inPortrait) => {
       if (inPortrait && this.state === 'playing') {
@@ -57,7 +57,6 @@ export class App {
 
     const unlock = () => {
       audio.unlock();
-      void lockLandscape();
     };
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
@@ -168,7 +167,6 @@ export class App {
     this.endWorld();
     this.mode = mode;
     this.state = 'intro';
-    void lockLandscape();
     this.ui.hideTitle();
     this.ui.showHud(false);
     this.showcase = null;
@@ -208,6 +206,7 @@ export class App {
     this.input.clear();
     this.input.capture = true;
     this.state = 'playing';
+    if (isHandheld() && isPortrait()) this.pause();
   }
 
   private pause(): void {
@@ -238,6 +237,7 @@ export class App {
 
   private resume(): void {
     if (this.state !== 'paused') return;
+    if (isHandheld() && isPortrait()) return;
     this.ui.hidePause();
     audio.setPaused(false);
     this.input.clear();

@@ -8,6 +8,7 @@ import { $, esc, fmtClock, fmtInt, html, wait } from './dom';
 import { CATEGORY_ART, ICON, INTRO_ART } from './icons';
 import { isConfirmKey, type Screen } from './nav';
 import { corners, fleuron } from './ornaments';
+import { controlText } from './control-text';
 
 export function showIntroCard(ctx: UiCtx, card: IntroCard): Promise<void> {
   const p = card.plan;
@@ -48,7 +49,7 @@ export function showIntroCard(ctx: UiCtx, card: IntroCard): Promise<void> {
         <div class="dz-nov-cat dz-caps">${esc(intro.category)}</div>
         <h3 class="dz-nov-title">${esc(intro.title)}</h3>
         <p class="dz-nov-text">${esc(intro.text)}</p>
-        <div class="dz-nov-tip"><span class="dz-nov-tip-h dz-script">Le conseil du Maître</span><p>${esc(intro.tip)}</p></div>
+        <div class="dz-nov-tip"><span class="dz-nov-tip-h dz-script">Le conseil du Maître</span><p>${esc(controlText(intro.tip))}</p></div>
       </aside>`
           : ''
       }

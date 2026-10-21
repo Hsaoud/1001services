@@ -7,7 +7,7 @@
  * - Binds tactiles directs sur les Anneaux Royaux et la Mini-carte.
  */
 import type { Input } from '../core/input';
-import { collapseMobileBars, device, fullscreenAvailable, isFullscreen, isIOS, toggleFullscreen } from '../core/device';
+import { device, fullscreenAvailable, isFullscreen, toggleFullscreen } from '../core/device';
 import type { World } from '../game/world';
 import { ICON } from './icons';
 
@@ -147,12 +147,8 @@ export class TouchControls {
       e.stopPropagation();
       toggleFullscreen();
       refreshFullBtn();
-      if (isIOS() && !isFullscreen()) {
-        collapseMobileBars();
-      }
     };
     this.fullBtn.addEventListener('click', onFullAction);
-    this.fullBtn.addEventListener('touchend', onFullAction);
 
     if (!fullscreenAvailable()) {
       this.fullBtn.classList.add('dz-hidden');
@@ -161,6 +157,10 @@ export class TouchControls {
 
     this.el.appendChild(this.topBar);
     this.el.addEventListener('contextmenu', (e) => e.preventDefault());
+    window.addEventListener('blur', () => this.release());
+    window.addEventListener('orientationchange', () => this.release());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.release(); });
+    device.subscribe(mode => { if (mode !== 'touch') this.release(); });
   }
 
   attach(input: Input): void {
@@ -207,12 +207,23 @@ export class TouchControls {
   }
 
   private bindAction(btn: HTMLElement, action: 'interact' | 'dash' | 'radar' | 'pause'): void {
+    let lastPointer = -Infinity;
+    const activate = () => {
+      this.input?.press(action);
+      device.vibrate(action === 'dash' ? 25 : 15);
+    };
     btn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       e.stopPropagation();
       btn.classList.add('is-press');
-      this.input?.press(action);
-      device.vibrate(action === 'dash' ? 25 : 15);
+      lastPointer = performance.now();
+      activate();
+    });
+    // VoiceOver and keyboard activation can send click without pointerdown.
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.detail === 0 || performance.now() - lastPointer > 500) activate();
     });
 
     const up = () => btn.classList.remove('is-press');
@@ -286,6 +297,8 @@ export class TouchControls {
     this.stickId = -1;
     this.base.classList.remove('is-on');
     this.input?.setStick(0, 0);
+    this.input?.clear();
+    this.el.querySelectorAll('.is-press').forEach(btn => btn.classList.remove('is-press'));
   }
 
   // ── Synchronisation par frame avec le monde
@@ -297,6 +310,7 @@ export class TouchControls {
       this.lastActLabel = fa.label;
       this.lastActState = fa.active;
       this.actLabel.textContent = fa.label;
+      this.actBtn.setAttribute('aria-label', fa.label);
       this.actBtn.classList.toggle('is-idle', !fa.active);
       this.actBtn.classList.toggle('is-active', fa.active);
     }

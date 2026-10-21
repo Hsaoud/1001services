@@ -1367,16 +1367,7 @@
 }
 
 :root[data-input='touch'] .dz-ctrl-touch {
-  display: flex !important;
-}
-
-@media (pointer: coarse) {
-  .dz-ctrl-desktop {
-    display: none !important;
-  }
-  .dz-ctrl-touch {
-    display: flex !important;
-  }
+  display: block !important;
 }
 
 .dz-ctrl-tag {

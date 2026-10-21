@@ -61,7 +61,7 @@ export function createSettings(ctx: UiCtx, initial: Settings, onChange: (s: Sett
             <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Joystick</span></span><span class="dz-ctrl-d">Se déplacer (moitié gauche de l'écran)</span></li>
             <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Action</span></span><span class="dz-ctrl-d">Prendre un plat, servir, cloche, sonner</span></li>
             <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Dash</span></span><span class="dz-ctrl-d">Pas chassé pour accélérer</span></li>
-            <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Radar</span></span><span class="dz-ctrl-d">Vue d’ensemble du salon</span></li>
+            <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Vue</span></span><span class="dz-ctrl-d">Vue d’ensemble du salon</span></li>
             <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Anneaux</span></span><span class="dz-ctrl-d">Toucher les anneaux royaux équipés</span></li>
             <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Pause</span></span><span class="dz-ctrl-d">Bouton pause en haut à droite</span></li>
           </ul>

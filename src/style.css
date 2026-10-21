@@ -13,19 +13,11 @@ body {
   touch-action: none;
 }
 
-/* Sur mobile tactile : autorise le micro-scroll de 1px pour replier l'en-tête de Safari iOS et Chrome sans déplacer l'application (#app est fixed) */
-@media (pointer: coarse) {
-  html {
-    overflow-y: auto;
-    overflow-x: hidden;
-    min-height: calc(100dvh + 1px);
-    min-height: calc(100% + 1px);
-  }
-}
-
 #app.duchesse-root {
   position: fixed;
   inset: 0;
+  width: var(--game-width, 100%);
+  height: var(--game-height, 100%);
   overflow: hidden;
   touch-action: none;
 }

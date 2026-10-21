@@ -37,34 +37,34 @@ export function isHandheld(): boolean {
   const q = new URLSearchParams(location.search).get('input');
   if (q === 'touch') return true;
   if (q === 'keyboard' || q === 'gamepad') return false;
-  return typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+  return isIOS() || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
 }
 
 /** Vérifie si l'écran est actuellement orienté en portrait. */
 export function isPortrait(): boolean {
   if (typeof window === 'undefined') return false;
-  if (window.screen?.orientation?.type) {
-    return window.screen.orientation.type.startsWith('portrait');
-  }
-  return window.innerHeight > window.innerWidth;
+  // Use the page's layout, like CSS orientation queries. Safari can expose an
+  // outdated screen.orientation.type while the viewport has already rotated.
+  if (window.innerWidth > 0 && window.innerHeight > 0) return window.innerHeight >= window.innerWidth;
+  return window.matchMedia?.('(orientation: portrait)').matches ?? true;
 }
 
-/**
- * Force le repliement des barres d'adresse/outils des navigateurs mobiles (iOS Safari, Android Chrome).
- * Nécessite un défilement léger (1px) sur une page dont la hauteur le permet.
- */
+/** Track Safari's visible viewport as its toolbars expand/collapse or the device rotates. */
+export function syncViewport(): void {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  const viewport = window.visualViewport;
+  const useVisual = viewport && Math.abs(viewport.scale - 1) < 0.01;
+  const width = useVisual ? viewport.width : window.innerWidth;
+  const height = useVisual ? viewport.height : window.innerHeight;
+  if (width > 0) document.documentElement.style.setProperty('--game-width', `${Math.round(width)}px`);
+  if (height > 0) document.documentElement.style.setProperty('--game-height', `${Math.round(height)}px`);
+}
+
+/** Reconcile layout after browser chrome changes; Safari controls its own toolbars. */
 export function collapseMobileBars(): void {
   if (typeof window === 'undefined') return;
-  try {
-    window.scrollTo(0, 1);
-    requestAnimationFrame(() => {
-      window.scrollTo(0, 1);
-    });
-    setTimeout(() => window.scrollTo(0, 1), 60);
-    setTimeout(() => window.scrollTo(0, 1), 220);
-  } catch {
-    // Ignoré si indisponible
-  }
+  syncViewport();
+  requestAnimationFrame(syncViewport);
 }
 
 /** Tente de verrouiller l'écran en mode paysage (supporté sur Android Chrome). */
@@ -115,7 +115,7 @@ export function isFullscreen(): boolean {
   return !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
 }
 
-/** Vérifie si le mode plein écran est disponible (ou mode immersif mobile tactile). */
+/** True only when the browser supports native DOM fullscreen. */
 export function fullscreenAvailable(): boolean {
   if (typeof document === 'undefined') return false;
   const el = document.documentElement as unknown as {
@@ -132,8 +132,7 @@ export function fullscreenAvailable(): boolean {
   };
   const hasFn = !!(el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen);
   const native = hasFn && doc.fullscreenEnabled !== false && doc.webkitFullscreenEnabled !== false;
-  // Sur appareil tactile (y compris iPhone où l'API DOM est absente), le bouton reste proposé
-  return native || isTouchDevice();
+  return native;
 }
 
 /** Bascule le mode plein écran. */
@@ -210,12 +209,12 @@ export async function enterFullscreen(): Promise<boolean> {
     // Ignoré si rejeté (ex: hors geste utilisateur)
   }
 
-  // Sur iPhone Safari ou navigateurs sans API plein écran DOM : repliement d'en-tête
+  // Sans API plein écran DOM, conserver les dimensions visibles du navigateur.
   collapseMobileBars();
   return false;
 }
 
-/** Tente de forcer le paysage, le plein écran et le masquage des barres d'adresse/en-têtes. */
+/** Demande le plein écran puis le paysage lorsque le navigateur les permet. */
 export async function forceLandscapeAndFullscreen(): Promise<void> {
   await enterFullscreen();
   await lockLandscape();
@@ -227,13 +226,19 @@ class DeviceTracker {
   private forced: InputMode | null = null;
   private readonly listeners = new Set<Listener>();
   private readonly fsListeners = new Set<FullscreenListener>();
+  private initialized = false;
 
   init(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || this.initialized) return;
+    this.initialized = true;
     const q = new URLSearchParams(location.search).get('input');
     if (q === 'touch' || q === 'gamepad' || q === 'keyboard') this.forced = q;
     this.mode = this.forced ?? (isTouchDevice() ? 'touch' : 'keyboard');
     this.reflect();
+    syncViewport();
+    window.addEventListener('resize', syncViewport, { passive: true });
+    window.visualViewport?.addEventListener('resize', syncViewport, { passive: true });
+    window.addEventListener('pageshow', syncViewport);
 
     window.addEventListener(
       'keydown',
@@ -249,7 +254,6 @@ class DeviceTracker {
       (e) => {
         if (e.pointerType === 'touch' || e.pointerType === 'pen') {
           this.set('touch');
-          void lockLandscape();
         } else if (e.pointerType === 'mouse' && this.mode !== 'touch') {
           this.set('keyboard');
         }

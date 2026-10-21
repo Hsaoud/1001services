@@ -6,6 +6,7 @@ import { $, esc, fmtDuration, html } from './dom';
 import { ICON, ITEM_SVG } from './icons';
 import type { Screen } from './nav';
 import { corners } from './ornaments';
+import { device } from '../core/device';
 
 const LEFT: ItemType[] = ['tray', 'vest', 'grinder'];
 const RIGHT: ItemType[] = ['latte', 'passkey', 'boots'];
@@ -218,6 +219,10 @@ export function createWardrobe(ctx: UiCtx, mode: GameMode, eq: Equipment, stats:
     const t = b.dataset.type as ItemType;
     b.addEventListener('dz-focus', () => showDetail(t));
     b.addEventListener('mouseenter', () => showDetail(t));
+    b.addEventListener('click', () => {
+      showDetail(t);
+      if (device.mode === 'touch') detail.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
   });
   el.querySelectorAll<HTMLElement>('[data-tab]').forEach((b) =>
     b.addEventListener('click', () => {

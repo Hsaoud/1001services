@@ -36,6 +36,8 @@ import { Announce, Overlays, Popups, Toasts } from './fx';
 import { Hud } from './hud';
 import { TouchControls } from './touch';
 import { OrientationGuard } from './orientation';
+import { controlText } from './control-text';
+import { device } from '../core/device';
 import { runCountdown, showIntroCard } from './intro';
 import { createLevelSelect } from './levelselect';
 import { showLootFlow } from './loot';
@@ -74,6 +76,7 @@ export class UI implements UiApi {
   readonly orientationGuard: OrientationGuard;
 
   constructor(container: HTMLElement) {
+    device.init();
     this.root = document.createElement('div');
     this.root.className = 'dz-root';
     this.root.setAttribute('lang', 'fr');
@@ -228,7 +231,13 @@ export class UI implements UiApi {
   }
 
   onOrientationChange(fn: (inPortrait: boolean) => void): void {
-    this.orientationGuard.setCallback(fn);
+    this.orientationGuard.setCallback(inPortrait => {
+      if (inPortrait) this.touch.release();
+      const screens = this.root.querySelector<HTMLElement>('.dz-screens');
+      if (screens) screens.inert = inPortrait;
+      this.touch.el.inert = inPortrait;
+      fn(inPortrait);
+    });
   }
 
   updateHud(s: HudState): void {
@@ -244,7 +253,7 @@ export class UI implements UiApi {
   }
 
   toast(text: string, kind: ToastKind = 'tip', seconds = 4.5): void {
-    this.toasts.show(text, kind, seconds);
+    this.toasts.show(controlText(text), kind, seconds);
   }
 
   announce(title: string, subtitle?: string, tone: 'gold' | 'rose' | 'cream' = 'gold'): void {
@@ -264,6 +273,7 @@ export class UI implements UiApi {
   }
 
   showPause(h: PauseHandlers): void {
+    this.touch.release();
     const wrapped: PauseHandlers = {
       onResume: () => {
         this.hidePause();

@@ -289,23 +289,6 @@
   display: none !important;
 }
 
-@media (pointer: coarse) {
-  .dz-key,
-  .dz-btn .dz-key,
-  .dz-primary .dz-key,
-  .dz-intro-go .dz-key,
-  .dz-ring-key,
-  .dz-bub-key,
-  .dz-mm-hint,
-  .dz-ls-keys,
-  .dz-title-keys,
-  .dz-pause-keys,
-  .dz-wd-ring .dz-key,
-  .dz-wr-list .dz-key {
-    display: none !important;
-  }
-}
-
 /* ── Repositionnement et redimensionnement du HUD en mode tactile pour libérer les pouces ── */
 
 /* 1. Plateau & jauge d'équilibre : recentrés en bas pour libérer totalement le joystick à gauche */
@@ -554,102 +537,168 @@
   cursor: pointer;
 }
 
+.dz-og-help {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Touch layouts use the visible viewport and respect the notch/home indicator. */
+:root[data-input='touch'] .dz-screen {
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+    max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+}
+
+:root[data-input='touch'] :is(.dz-title-card, .dz-set-card, .dz-pause-card, .dz-intro-wrap,
+  .dz-bill-wrap, .dz-fail-card, .dz-finale-card, .dz-loot-stage) {
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+:root[data-input='touch'] :is(.dz-wr-card, .dz-ls-card) {
+  width: 100%;
+  height: 100%;
+  max-width: 1100px;
+  max-height: 100%;
+  padding: 12px 16px;
+}
+
+:root[data-input='touch'] :is(.dz-wr-body, .dz-ls-scroll, .dz-wr-side, .dz-set-card) {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+:root[data-input='touch'] :is(.dz-btn, .dz-mi, .dz-tab, .dz-wslot, .dz-seg-b, .dz-switch) {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+:root[data-input='touch'] .dz-root button { min-height: 44px; }
+
+:root[data-input='touch'] :is(.dz-tbtn-small, .dz-ringslot) {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+:root[data-input='touch'] .dz-traycard { pointer-events: none; }
+:root[data-input='touch'] .dz-hud-tr {
+  right: calc(max(12px, env(safe-area-inset-right)) + 104px);
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+  :root { --tb: clamp(52px, 13vmin, 64px); }
+  :root[data-input='touch'] .dz-root { --u: clamp(7px, 1.55vmin, 10px); }
+
+  :root[data-input='touch'] .dz-title { justify-content: center; }
+  :root[data-input='touch'] .dz-title-card {
+    display: grid;
+    grid-template-columns: minmax(160px, .85fr) minmax(260px, 1.3fr);
+    grid-template-rows: auto auto 1fr auto;
+    gap: 8px 18px;
+    width: min(740px, 100%);
+    margin: 0;
+    padding: 14px 18px;
+    align-items: center;
+  }
+  :root[data-input='touch'] .dz-title-menu { grid-column: 2; grid-row: 1 / 5; }
+  :root[data-input='touch'] .dz-title-pre { grid-column: 1; grid-row: 1; font-size: 11px; text-align: center; }
+  :root[data-input='touch'] .dz-title-main { grid-column: 1; grid-row: 2; margin: 0; }
+  :root[data-input='touch'] .dz-t-1001 { font-size: 27px; }
+  :root[data-input='touch'] .dz-t-script { font-size: 38px; }
+  :root[data-input='touch'] .dz-tagline { grid-column: 1; grid-row: 3; font-size: 14px; margin: 0; }
+  :root[data-input='touch'] .dz-title-foot { grid-column: 1; grid-row: 4; margin: 0; padding: 0; }
+  :root[data-input='touch'] .dz-title-credit { font-size: 11px; }
+  :root[data-input='touch'] .dz-title :is(.dz-title-crown, .dz-title-art, .dz-fleuron-wrap) { display: none; }
+  :root[data-input='touch'] .dz-mi { padding: 6px 10px; }
+  :root[data-input='touch'] .dz-mi-name { font-size: 20px; }
+  :root[data-input='touch'] .dz-mi-sub .dz-mi-name { font-size: 16px; white-space: normal; }
+  :root[data-input='touch'] :is(.dz-mi-price, .dz-mi-desc) { font-size: 13px; }
+  :root[data-input='touch'] .dz-mi-meta { font-size: 11px; }
+  :root[data-input='touch'] .dz-mi-sep { margin: 2px 8px; }
+  :root[data-input='touch'] .dz-modechip { font-size: 11px; }
+  :root[data-input='touch'] .dz-mi-dots { min-width: 4px; }
+
+  :root[data-input='touch'] :is(.dz-set-card, .dz-pause-card, .dz-intro-card, .dz-novelty, .dz-fail-card, .dz-finale-card) {
+    padding: 12px 18px;
+  }
+  :root[data-input='touch'] .dz-pause-card > * { flex-shrink: 0; }
+  :root[data-input='touch'] .dz-pause-art { display: none; }
+  :root[data-input='touch'] :is(.dz-btn, .dz-tab) { font-size: 15px; padding: 6px 14px; }
+  :root[data-input='touch'] .dz-h-title { font-size: 32px; }
+  :root[data-input='touch'] :is(.dz-ls-head, .dz-wr-head) .dz-h-title { font-size: 32px; }
+  :root[data-input='touch'] .dz-h-eyebrow { font-size: 10px; }
+  :root[data-input='touch'] .dz-set-cols { gap: 18px; }
+  :root[data-input='touch'] :is(.dz-set-label, .dz-ctrl, .dz-ctrl-tag, .dz-ctrl-d) { font-size: 14px; }
+  :root[data-input='touch'] .dz-range { min-height: 44px; }
+
+  :root[data-input='touch'] .dz-wr-body { display: block; overflow-y: auto; }
+  :root[data-input='touch'] .dz-wr-doll {
+    grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr);
+    grid-template-rows: minmax(220px, auto) auto;
+    gap: 10px 12px;
+    padding-bottom: 12px;
+  }
+  :root[data-input='touch'] .dz-wr-figure { width: 120px; height: 210px; }
+  :root[data-input='touch'] .dz-wr-side { width: 100%; max-height: none; overflow: visible; }
+  :root[data-input='touch'] .dz-ws-name { font-size: 14px; }
+  :root[data-input='touch'] .dz-ws-slot { font-size: 11px; }
+  :root[data-input='touch'] .dz-ws-art { width: 36px; height: 36px; }
+  :root[data-input='touch'] .dz-wslot { padding: 6px 8px; gap: 8px; }
+  :root[data-input='touch'] .dz-wr-rings-row { gap: 8px; }
+  :root[data-input='touch'] .dz-wslot.dz-compact .dz-ws-name { font-size: 12px; }
+  :root[data-input='touch'] :is(.dz-wd, .dz-wr-list) { font-size: 14px; }
+  :root[data-input='touch'] .dz-ls-detail { display: none; }
+  :root[data-input='touch'] .dz-ls-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  :root[data-input='touch'] .dz-ls-foot { flex: none; margin-top: 6px; padding-top: 6px; }
+
+  :root[data-input='touch'] .dz-intro-wrap { width: min(740px, 100%); align-items: stretch; gap: 12px; }
+  :root[data-input='touch'] .dz-intro-card { width: min(480px, 100%); flex: 1; flex-shrink: 0; }
+  :root[data-input='touch'] .dz-novelty { width: 260px; flex: none; }
+  :root[data-input='touch'] :is(.dz-intro-goal, .dz-nov-text, .dz-nov-tip p) { font-size: 14px; }
+  :root[data-input='touch'] .dz-bill-wrap { justify-content: flex-start; }
+  :root[data-input='touch'] .dz-bill-shadow { flex: none; transform: none; }
+  :root[data-input='touch'] .dz-bill-actions { flex: none; }
+  :root[data-input='touch'] .dz-loot-stage > * { flex-shrink: 0; }
+  :root[data-input='touch'] .dz-loot-main { min-height: 250px; }
+  :root[data-input='touch'] .dz-wheel { width: min(44vmin, 260px); height: min(44vmin, 260px); }
+  :root[data-input='touch'] .dz-wheel-side { width: min(250px, 42vw); }
+
+  :root[data-input='touch'] .dz-hud-bl { left: 45%; }
+  :root[data-input='touch'] .dz-traycard { flex-direction: column; width: min(28vw, 210px); gap: 2px; padding: 4px 8px; }
+  :root[data-input='touch'] .dz-meters { min-width: 0; width: 100%; }
+  :root[data-input='touch'] .dz-tray { height: 24px; width: 100%; }
+  :root[data-input='touch'] .dz-slot { width: 23px; height: 23px; }
+  :root[data-input='touch'] .dz-pl-salon { display: none; }
+  :root[data-input='touch'] .dz-score-head { font-size: 10px; }
+  :root[data-input='touch'] .dz-combo { display: none; }
+  :root[data-input='touch'] .dz-toasts { top: 76px; width: min(340px, 46vw); }
+  :root[data-input='touch'] .dz-toast-text { font-size: 13px; }
+  :root[data-input='touch'] .dz-rings { gap: 4px; padding: 4px 6px; }
+}
+
+@media (max-width: 700px) and (orientation: landscape) {
+  :root[data-input='touch'] .dz-title-card { grid-template-columns: minmax(130px, .75fr) minmax(220px, 1.3fr); gap: 6px 12px; }
+  :root[data-input='touch'] .dz-tagline { font-size: 13px; }
+  :root[data-input='touch'] .dz-mi-meta { display: none; }
+  :root[data-input='touch'] .dz-mi-price { font-size: 11px; }
+  :root[data-input='touch'] .dz-t-1001 { font-size: 23px; }
+  :root[data-input='touch'] .dz-t-script { font-size: 31px; }
+  :root[data-input='touch'] .dz-set-cols { grid-template-columns: 1fr; }
+  :root[data-input='touch'] .dz-intro-wrap { display: block; }
+  :root[data-input='touch'] .dz-intro-card { width: 100%; }
+  :root[data-input='touch'] .dz-novelty { width: 100%; margin-top: 12px; }
+}
+
 /* Déclencheur CSS de secours si portrait détecté */
 @media (orientation: portrait) and (pointer: coarse) and (max-aspect-ratio: 1/1) {
   .dz-orientation-guard:not(.dz-off) {
     display: flex !important;
-  }
-}
-
-/* ── Adaptations paysages pour écrans mobiles (iPhone & Android : hauteur ≤ 520px) */
-@media (max-height: 520px) and (orientation: landscape) {
-  :root {
-    --tb: clamp(42px, 11vmin, 62px);
-  }
-
-  .dz-root {
-    --u: clamp(6px, 1.1vmin, 15px);
-  }
-
-  /* Cartes de menus : dimensionnées pour ne jamais déborder sur 100dvh et iPhone notches */
-  .dz-card,
-  .dz-title-card,
-  .dz-wr-card,
-  .dz-ls-card,
-  .dz-settings-card,
-  .dz-intro-card,
-  .dz-res-card,
-  .dz-fail-card {
-    max-height: calc(100dvh - max(8px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
-    max-width: calc(100vw - max(20px, env(safe-area-inset-left) + env(safe-area-inset-right)));
-    padding: calc(var(--u) * 1.2) calc(var(--u) * 2.2);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .dz-title-crown {
-    display: none;
-  }
-
-  .dz-t-1001 {
-    font-size: calc(var(--u) * 4.2);
-  }
-
-  /* Garde-robe sur mobile paysage */
-  .dz-wr-body {
-    display: flex;
-    flex-direction: row;
-    gap: calc(var(--u) * 1.4);
-    align-items: stretch;
-    overflow-y: auto;
-  }
-
-  .dz-wr-doll {
-    flex: 1.4;
-    grid-template-columns: 1fr calc(var(--u) * 19) 1fr;
-    gap: calc(var(--u) * 0.8) calc(var(--u) * 1.2);
-  }
-
-  .dz-wr-figure {
-    width: calc(var(--u) * 19);
-    max-height: calc(var(--u) * 36);
-  }
-
-  .dz-wr-side {
-    flex: 1;
-    min-width: calc(var(--u) * 24);
-    max-height: calc(var(--u) * 38);
-    overflow-y: auto;
-  }
-
-  .dz-wslot {
-    padding: calc(var(--u) * 0.4) calc(var(--u) * 0.8);
-    gap: calc(var(--u) * 0.7);
-  }
-
-  .dz-ws-art {
-    width: calc(var(--u) * 4.2);
-    height: calc(var(--u) * 4.2);
-  }
-
-  /* Carte des services sur mobile paysage */
-  .dz-ls-body {
-    display: flex;
-    flex-direction: row;
-    gap: calc(var(--u) * 1.5);
-    max-height: calc(100dvh - 90px);
-  }
-
-  .dz-ls-menu {
-    flex: 1.5;
-    max-height: 100%;
-    overflow-y: auto;
-  }
-
-  .dz-ls-detail {
-    flex: 1;
-    max-height: 100%;
-    overflow-y: auto;
   }
 }
 
