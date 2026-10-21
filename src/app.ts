@@ -14,6 +14,7 @@ import { generateSalon } from './gen';
 import { levelPlan, BIOME_NAMES, LEVEL_COUNT } from './data/progression';
 import { WHEEL, computeStats, isUpgrade, makeItem, rollItemType } from './data/items';
 import { World, type FrameInput } from './game/world';
+import { device, lockLandscape } from './core/device';
 import type { GameMode, Item, ItemType, SalonLayout, SaveData, Settings } from './types';
 
 type AppState = 'title' | 'menu' | 'intro' | 'playing' | 'paused' | 'end';
@@ -45,7 +46,18 @@ export class App {
     this.ui.setDishIconProvider((id) => this.renderer.dishIcon(id));
     this.applySettings(this.save.settings);
 
-    const unlock = () => audio.unlock();
+    device.init();
+    this.ui.attachTouchInput?.(this.input);
+    this.ui.onOrientationChange?.((inPortrait) => {
+      if (inPortrait && this.state === 'playing') {
+        this.pause();
+      }
+    });
+
+    const unlock = () => {
+      audio.unlock();
+      void lockLandscape();
+    };
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
     window.addEventListener('blur', () => {
@@ -155,6 +167,7 @@ export class App {
     this.endWorld();
     this.mode = mode;
     this.state = 'intro';
+    void lockLandscape();
     this.ui.hideTitle();
     this.ui.showHud(false);
     this.showcase = null;
@@ -369,6 +382,7 @@ export class App {
             rings: [this.input.take('ring1'), this.input.take('ring2'), this.input.take('ring3'), this.input.take('ring4')],
           };
           w.update(dt, fi);
+          this.ui.updateTouch?.(w);
           if (w.status !== 'playing') void this.endService();
         }
       } else if (this.state === 'paused' && this.input.take('pause')) {

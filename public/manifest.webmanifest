@@ -1,0 +1,20 @@
+{
+  "name": "Les 1001 Services de La Duchesse",
+  "short_name": "1001 Services",
+  "description": "Jeu d'adresse et de service en diorama 3D inspiré de La Duchesse à Toulouse.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#f6e7e4",
+  "theme_color": "#f6e7e4",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f3d9d6'/%3E%3Cpath d='M6 22h20M8 22a8 8 0 0 1 16 0' stroke='%23b8893b' stroke-width='2.4' fill='%23e9c46a'/%3E%3Ccircle cx='16' cy='12' r='1.8' fill='%23b8893b'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

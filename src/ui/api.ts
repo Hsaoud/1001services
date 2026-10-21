@@ -97,6 +97,11 @@ export interface UiApi {
   showPause(h: PauseHandlers): void;
   hidePause(): void;
 
+  // ── Mobile & Tactile
+  attachTouchInput?(input: import('../core/input').Input): void;
+  updateTouch?(world: import('../game/world').World): void;
+  onOrientationChange?(fn: (inPortrait: boolean) => void): void;
+
   // ── Fin de service
   /** L'addition : récapitulatif du service. Se résout sur « Continuer ». */
   showResults(r: ServiceResult): Promise<void>;

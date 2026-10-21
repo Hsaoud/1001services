@@ -20,14 +20,15 @@ Pages de laboratoire (en dev) : `render-lab.html` (salons & effets), `models-lab
 
 ## Commandes
 
-| Action | Clavier | Manette |
-| --- | --- | --- |
-| Se déplacer | ZQSD / WASD / flèches | stick gauche |
-| Prendre / servir / ouvrir une cloche / sonner | E (ou Entrée) | A |
-| Pas Chassé (Dash) | Espace ou Maj | B / RB |
-| Vue d'ensemble du salon | Tab | Y |
-| Anneaux Royaux | 1 2 3 4 | croix directionnelle |
-| Pause | Échap / P | Start |
+| Action | Clavier | Manette | Mobile / Tactile |
+| --- | --- | --- | --- |
+| Se déplacer | ZQSD / WASD / flèches | stick gauche | Joystick flottant (pouce gauche) |
+| Prendre / servir / ouvrir une cloche / sonner | E (ou Entrée) | A | Bouton d'action contextuel doré |
+| Pas Chassé (Dash) | Espace ou Maj | B / RB | Bouton Dash (pips & recharge) |
+| Vue d'ensemble du salon | Tab | Y | Bouton Vue / toucher la mini-carte |
+| Anneaux Royaux | 1 2 3 4 | croix directionnelle | Toucher directement les anneaux du HUD |
+| Pause | Échap / P | Start | Bouton Pause (barre supérieure) |
+| Plein écran | F11 | — | Bouton Plein écran (barre supérieure) |
 
 ## Structure
 

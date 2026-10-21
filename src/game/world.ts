@@ -43,6 +43,7 @@ import { CollisionWorld } from './collision';
 import { Player, emptyPlayerView } from './player';
 import { Service, type CounterState, type TableState } from './service';
 import { Cloches, type Cloche } from './cloches';
+import { device } from '../core/device';
 import { createHazards } from './hazards';
 
 export type WorldStatus = 'playing' | 'won' | 'failed';
@@ -144,6 +145,7 @@ export class World implements HazardWorld {
       dash: (x, z, dx, dz) => {
         this.sfx('dash');
         this.fx('dash', x, z, { dirX: dx, dirZ: dz });
+        device.vibrate(25);
       },
       dashEmpty: () => this.sfx('dash_empty', { volume: 0.6 }),
       crash: (x, z, lost) => {
@@ -154,6 +156,7 @@ export class World implements HazardWorld {
         this.sfx('tray_crash');
         this.shake(0.45);
         this.popupAt(x, z, 'Patatras !', 'bad', true);
+        device.vibrate([40, 50, 40]);
       },
       fallen: () => {
         this.sfx('fall');
@@ -365,6 +368,22 @@ export class World implements HazardWorld {
     this.focus = best;
   }
 
+  /** Renvoie l'action contextuelle courante sous le focus pour l'interface tactile. */
+  getFocusAction(): { label: string; active: boolean; kind: 'table' | 'counter' | 'cloche' | 'bell' | null } {
+    const f = this.focus;
+    if (!f) return { label: 'Action', active: false, kind: null };
+    switch (f.kind) {
+      case 'table':
+        return { label: f.ok ? 'Servir' : 'Attente', active: f.ok, kind: 'table' };
+      case 'counter':
+        return { label: f.ok ? 'Prendre' : 'Comptoir', active: f.ok, kind: 'counter' };
+      case 'cloche':
+        return { label: 'Ouvrir', active: true, kind: 'cloche' };
+      case 'bell':
+        return { label: 'Sonner', active: this.quotaReached, kind: 'bell' };
+    }
+  }
+
   private interact(): void {
     const f = this.focus;
     const p = this.player;
@@ -373,6 +392,7 @@ export class World implements HazardWorld {
       case 'table': {
         if (!f.ok) {
           this.sfx('wrong');
+          device.vibrate(50);
           const want = f.t.order ? DISHES[f.t.order].short : '…';
           this.popupAt(f.t.spec.x, f.t.spec.z, `Ils attendent : ${want}`, 'cream');
           return;
@@ -385,6 +405,7 @@ export class World implements HazardWorld {
         if (p.tray.length >= this.capacity) {
           this.popupAt(c.spec.x, c.spec.z, 'Plateau plein', 'cream');
           this.sfx('dash_empty', { volume: 0.5 });
+          device.vibrate(40);
           return;
         }
         if (!c.ready.length) {
@@ -395,6 +416,7 @@ export class World implements HazardWorld {
         if (taken.length) {
           this.sfx('pickup', { pitch: 1 + taken.length * 0.06 });
           this.fx('pickup', c.spec.x, c.spec.z, { y: 0.9 });
+          device.vibrate(20);
         }
         return;
       }
@@ -405,6 +427,7 @@ export class World implements HazardWorld {
         if (!this.quotaReached) {
           this.popupAt(this.layout.royalBell.x, this.layout.royalBell.z, `Encore ${Math.ceil(this.plan.quota - this.score)} points`, 'cream');
           this.sfx('wrong', { volume: 0.5 });
+          device.vibrate(50);
           return;
         }
         this.ringBell();
@@ -505,6 +528,7 @@ export class World implements HazardWorld {
     this.player.bellRing = 1;
     this.bellRingT = 1;
     this.sfx('royal_bell');
+    device.vibrate([70, 40, 110]);
     const b = this.layout.royalBell;
     this.fx('confetti', b.x, b.z, { y: 1.2 });
     this.fx('petals', this.player.x, this.player.z);

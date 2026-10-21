@@ -13,6 +13,7 @@ import './ui.css';
 import './hud.css';
 import './menus.css';
 import './service.css';
+import './touch.css';
 
 import type {
   BubbleState,
@@ -33,6 +34,8 @@ import type { UiCtx } from './ctx';
 import { DishIcons } from './dishicons';
 import { Announce, Overlays, Popups, Toasts } from './fx';
 import { Hud } from './hud';
+import { TouchControls } from './touch';
+import { OrientationGuard } from './orientation';
 import { runCountdown, showIntroCard } from './intro';
 import { createLevelSelect } from './levelselect';
 import { showLootFlow } from './loot';
@@ -67,6 +70,9 @@ export class UI implements UiApi {
   private pause: Screen | null = null;
   private hudOn = false;
 
+  readonly touch: TouchControls;
+  readonly orientationGuard: OrientationGuard;
+
   constructor(container: HTMLElement) {
     this.root = document.createElement('div');
     this.root.className = 'dz-root';
@@ -87,6 +93,10 @@ export class UI implements UiApi {
     const screens = document.createElement('div');
     screens.className = 'dz-screens';
 
+    this.touch = new TouchControls();
+    this.orientationGuard = new OrientationGuard();
+    this.touch.bindHud(this.hud.el);
+
     this.hud.el.classList.add('dz-off');
     this.bubbles.el.classList.add('dz-off');
     this.root.append(
@@ -94,11 +104,13 @@ export class UI implements UiApi {
       this.bubbles.el,
       this.popups.el,
       this.hud.el,
+      this.touch.el,
       this.announcer.el,
       this.toasts.el,
       this.countdownLayer,
       this.overlays.flash,
       screens,
+      this.orientationGuard.el,
     );
     container.appendChild(this.root);
 
@@ -195,11 +207,24 @@ export class UI implements UiApi {
     this.hudOn = on;
     this.hud.el.classList.toggle('dz-off', !on);
     this.bubbles.el.classList.toggle('dz-off', !on);
+    this.touch.show(on);
     if (on) this.hud.reset();
     else {
       this.bubbles.clear();
       this.minimap.update(null, false);
     }
+  }
+
+  attachTouchInput(input: import('../core/input').Input): void {
+    this.touch.attach(input);
+  }
+
+  updateTouch(world: import('../game/world').World): void {
+    this.touch.update(world);
+  }
+
+  onOrientationChange(fn: (inPortrait: boolean) => void): void {
+    this.orientationGuard.setCallback(fn);
   }
 
   updateHud(s: HudState): void {
