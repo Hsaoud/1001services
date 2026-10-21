@@ -431,6 +431,17 @@
   color: var(--ink);
 }
 
+/* Masquage global des raccourcis claviers sur tactile / mobile */
+:root[data-input='touch'] .dz-key {
+  display: none !important;
+}
+
+@media (pointer: coarse) {
+  .dz-key {
+    display: none !important;
+  }
+}
+
 /* Petits pictogrammes en ligne */
 .dz-ico {
   display: inline-block;

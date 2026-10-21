@@ -273,14 +273,37 @@
   transition: transform 0.08s;
 }
 
-/* Masquage des badges de touches clavier sur appareil tactile */
+/* Masquage complet de tous les raccourcis et badges clavier sur appareil tactile / mobile */
+:root[data-input='touch'] .dz-key,
+:root[data-input='touch'] .dz-btn .dz-key,
+:root[data-input='touch'] .dz-primary .dz-key,
+:root[data-input='touch'] .dz-intro-go .dz-key,
 :root[data-input='touch'] .dz-ring-key,
 :root[data-input='touch'] .dz-bub-key,
 :root[data-input='touch'] .dz-mm-hint,
 :root[data-input='touch'] .dz-ls-keys,
 :root[data-input='touch'] .dz-title-keys,
-:root[data-input='touch'] .dz-pause-keys {
+:root[data-input='touch'] .dz-pause-keys,
+:root[data-input='touch'] .dz-wd-ring .dz-key,
+:root[data-input='touch'] .dz-wr-list .dz-key {
   display: none !important;
+}
+
+@media (pointer: coarse) {
+  .dz-key,
+  .dz-btn .dz-key,
+  .dz-primary .dz-key,
+  .dz-intro-go .dz-key,
+  .dz-ring-key,
+  .dz-bub-key,
+  .dz-mm-hint,
+  .dz-ls-keys,
+  .dz-title-keys,
+  .dz-pause-keys,
+  .dz-wd-ring .dz-key,
+  .dz-wr-list .dz-key {
+    display: none !important;
+  }
 }
 
 /* ── Repositionnement et redimensionnement du HUD en mode tactile pour libérer les pouces ── */

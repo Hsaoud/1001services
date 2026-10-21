@@ -7,7 +7,7 @@
  * - Binds tactiles directs sur les Anneaux Royaux et la Mini-carte.
  */
 import type { Input } from '../core/input';
-import { device, fullscreenAvailable, toggleFullscreen } from '../core/device';
+import { collapseMobileBars, device, fullscreenAvailable, isFullscreen, isIOS, toggleFullscreen } from '../core/device';
 import type { World } from '../game/world';
 import { ICON } from './icons';
 
@@ -125,18 +125,35 @@ export class TouchControls {
     this.bindAction(this.pauseBtn, 'pause');
     this.topBar.appendChild(this.pauseBtn);
 
+    const ICON_FULL = `<svg viewBox="0 0 24 24"><path d="M3 9V4h5M21 9V4h-5M3 15v5h5M21 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const ICON_EXIT = `<svg viewBox="0 0 24 24"><path d="M9 3v5H4M15 3v5h5M9 21v-5H4M15 21v-5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
     this.fullBtn = document.createElement('button');
     this.fullBtn.type = 'button';
     this.fullBtn.className = 'dz-tbtn-small dz-tbtn-full';
     this.fullBtn.setAttribute('aria-label', 'Plein écran');
-    this.fullBtn.innerHTML = `
-      <svg viewBox="0 0 24 24"><path d="M3 9V4h5M21 9V4h-5M3 15v5h5M21 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    `;
-    this.fullBtn.addEventListener('pointerdown', (e) => {
+    this.fullBtn.innerHTML = ICON_FULL;
+
+    const refreshFullBtn = (fs: boolean = isFullscreen()) => {
+      this.fullBtn.innerHTML = fs ? ICON_EXIT : ICON_FULL;
+      this.fullBtn.setAttribute('aria-label', fs ? 'Quitter le plein écran' : 'Plein écran');
+      this.fullBtn.classList.toggle('is-active', fs);
+    };
+
+    device.onFullscreenChange(refreshFullBtn);
+
+    const onFullAction = (e: Event) => {
       e.preventDefault();
       e.stopPropagation();
       toggleFullscreen();
-    });
+      refreshFullBtn();
+      if (isIOS() && !isFullscreen()) {
+        collapseMobileBars();
+      }
+    };
+    this.fullBtn.addEventListener('click', onFullAction);
+    this.fullBtn.addEventListener('touchend', onFullAction);
+
     if (!fullscreenAvailable()) {
       this.fullBtn.classList.add('dz-hidden');
     }

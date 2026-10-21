@@ -38,4 +38,16 @@ describe('mobile & virtual input', () => {
     device.set('keyboard');
     expect(device.mode).toBe('keyboard');
   });
+
+  it('notifie les abonnés lors d’un changement de plein écran', () => {
+    let received: boolean | null = null;
+    const unsub = device.onFullscreenChange((fs) => {
+      received = fs;
+    });
+    device.notifyFullscreen(true);
+    expect(received).toBe(true);
+    device.notifyFullscreen(false);
+    expect(received).toBe(false);
+    unsub();
+  });
 });

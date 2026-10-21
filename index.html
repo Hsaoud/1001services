@@ -27,6 +27,15 @@
     </style>
   </head>
   <body>
+    <script>
+      (function () {
+        var isTouch = 'ontouchstart' in window || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        var q = new URLSearchParams(location.search).get('input');
+        if (q === 'touch' || (isTouch && q !== 'keyboard' && q !== 'gamepad')) {
+          document.documentElement.dataset.input = 'touch';
+        }
+      })();
+    </script>
     <div id="app"></div>
     <script>
       // Badge de l'hébergeur (Netlify) : masqué s'il est présent ou ajouté dynamiquement.

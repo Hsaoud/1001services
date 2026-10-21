@@ -5,7 +5,7 @@
  *   affiche un écran d'invitation au pivotement avec animation, bloquant les contrôles
  *   jusqu'à ce que l'appareil soit tourné à l'horizontale.
  */
-import { forceLandscapeAndFullscreen, isFullscreen, isPortrait, isTouchDevice, lockLandscape } from '../core/device';
+import { collapseMobileBars, enterFullscreen, forceLandscapeAndFullscreen, isFullscreen, isPortrait, isTouchDevice, lockLandscape } from '../core/device';
 
 export class OrientationGuard {
   readonly el: HTMLElement;
@@ -43,8 +43,15 @@ export class OrientationGuard {
     `;
 
     const btn = this.el.querySelector('.dz-og-lockbtn') as HTMLButtonElement | null;
-    btn?.addEventListener('click', () => {
-      void forceLandscapeAndFullscreen();
+    btn?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await forceLandscapeAndFullscreen();
+    });
+
+    // Toucher sur l'écran d'orientation pour forcer le verrouillage paysage et plein écran
+    this.el.addEventListener('click', async (e) => {
+      if ((e.target as HTMLElement).closest('.dz-og-lockbtn')) return;
+      await forceLandscapeAndFullscreen();
     });
 
     // Écoute des changements d'orientation et redimensionnement
@@ -55,19 +62,18 @@ export class OrientationGuard {
       screen.orientation.addEventListener('change', check);
     }
 
-    // Dès le premier toucher sur l'écran d'orientation, forcer paysage et plein écran
-    this.el.addEventListener('pointerdown', () => {
-      void forceLandscapeAndFullscreen();
-    });
-
-    // Sur mobile en paysage, forcer le plein écran dès le premier geste tactile
+    // Sur mobile en paysage, forcer le plein écran dès le premier geste tactile valide (click / touchend)
     const tryFullscreenOnTouch = () => {
-      if (!isPortrait() && isTouchDevice() && !isFullscreen()) {
-        void forceLandscapeAndFullscreen();
+      if (!isPortrait() && isTouchDevice()) {
+        if (!isFullscreen()) {
+          void enterFullscreen();
+        } else {
+          collapseMobileBars();
+        }
       }
     };
-    window.addEventListener('pointerdown', tryFullscreenOnTouch, { passive: true });
-    window.addEventListener('touchend', tryFullscreenOnTouch, { passive: true });
+    window.addEventListener('click', tryFullscreenOnTouch, { capture: true, passive: true });
+    window.addEventListener('touchend', tryFullscreenOnTouch, { capture: true, passive: true });
 
     this.check();
   }
@@ -91,8 +97,9 @@ export class OrientationGuard {
       if (shouldBlock) {
         void lockLandscape();
       } else if (wasActive && touch) {
-        // Sortie du mode portrait -> passage en paysage : forcer le plein écran immédiatement !
-        void forceLandscapeAndFullscreen();
+        // Sortie du mode portrait -> passage en paysage : replier immédiatement l'en-tête du navigateur
+        collapseMobileBars();
+        void lockLandscape();
       }
       this.onPortraitChange?.(shouldBlock);
     }

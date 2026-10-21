@@ -49,13 +49,21 @@ export function createSettings(ctx: UiCtx, initial: Settings, onChange: (s: Sett
         </div>
         <section class="dz-set-sec dz-set-controls">
           <h3 class="dz-set-h"><span class="dz-caps">Le service, mode d’emploi</span></h3>
-          <ul class="dz-ctrl">
+          <ul class="dz-ctrl dz-ctrl-desktop">
             <li><span class="dz-ctrl-k"><span class="dz-key">Z</span><span class="dz-key">Q</span><span class="dz-key">S</span><span class="dz-key">D</span><em>ou</em><span class="dz-key">W</span><span class="dz-key">A</span><span class="dz-key">S</span><span class="dz-key">D</span><em>ou</em><span class="dz-key">←</span><span class="dz-key">↑</span><span class="dz-key">↓</span><span class="dz-key">→</span></span><span class="dz-ctrl-d">Se déplacer</span></li>
             <li><span class="dz-ctrl-k"><span class="dz-key">E</span></span><span class="dz-ctrl-d">Prendre un plat, servir, ouvrir une cloche, sonner</span></li>
             <li><span class="dz-ctrl-k"><span class="dz-key">Espace</span><em>ou</em><span class="dz-key">Maj</span></span><span class="dz-ctrl-d">Pas chassé (Dash)</span></li>
             <li><span class="dz-ctrl-k"><span class="dz-key">Tab</span></span><span class="dz-ctrl-d">Vue d’ensemble du salon</span></li>
             <li><span class="dz-ctrl-k"><span class="dz-key">1</span><span class="dz-key">2</span><span class="dz-key">3</span><span class="dz-key">4</span></span><span class="dz-ctrl-d">Pouvoirs des anneaux royaux</span></li>
             <li><span class="dz-ctrl-k"><span class="dz-key">Échap</span></span><span class="dz-ctrl-d">Pause</span></li>
+          </ul>
+          <ul class="dz-ctrl dz-ctrl-touch">
+            <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Joystick</span></span><span class="dz-ctrl-d">Se déplacer (moitié gauche de l'écran)</span></li>
+            <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Action</span></span><span class="dz-ctrl-d">Prendre un plat, servir, cloche, sonner</span></li>
+            <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Dash</span></span><span class="dz-ctrl-d">Pas chassé pour accélérer</span></li>
+            <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Radar</span></span><span class="dz-ctrl-d">Vue d’ensemble du salon</span></li>
+            <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Anneaux</span></span><span class="dz-ctrl-d">Toucher les anneaux royaux équipés</span></li>
+            <li><span class="dz-ctrl-k"><span class="dz-ctrl-tag">Pause</span></span><span class="dz-ctrl-d">Bouton pause en haut à droite</span></li>
           </ul>
         </section>
       </div>

@@ -7,6 +7,22 @@
 export type InputMode = 'keyboard' | 'gamepad' | 'touch';
 
 type Listener = (mode: InputMode) => void;
+type FullscreenListener = (isFullscreen: boolean) => void;
+
+/** Détecte un appareil iOS (iPhone, iPad, iPod touch). */
+export function isIOS(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent || '';
+  const plat = navigator.platform || '';
+  return /iPad|iPhone|iPod/.test(ua) || (plat === 'MacIntel' && (navigator.maxTouchPoints ?? 0) > 1);
+}
+
+/** Vérifie si l'application est exécutée en mode autonome / PWA (installée sur l'écran d'accueil). */
+export function isStandalone(): boolean {
+  if (typeof window === 'undefined') return false;
+  const nav = navigator as unknown as { standalone?: boolean };
+  return !!(nav.standalone || window.matchMedia?.('(display-mode: standalone)').matches);
+}
 
 /** Appareil tactile principal (téléphone, tablette). */
 export function isTouchDevice(): boolean {
@@ -31,6 +47,24 @@ export function isPortrait(): boolean {
     return window.screen.orientation.type.startsWith('portrait');
   }
   return window.innerHeight > window.innerWidth;
+}
+
+/**
+ * Force le repliement des barres d'adresse/outils des navigateurs mobiles (iOS Safari, Android Chrome).
+ * Nécessite un défilement léger (1px) sur une page dont la hauteur le permet.
+ */
+export function collapseMobileBars(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.scrollTo(0, 1);
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 1);
+    });
+    setTimeout(() => window.scrollTo(0, 1), 60);
+    setTimeout(() => window.scrollTo(0, 1), 220);
+  } catch {
+    // Ignoré si indisponible
+  }
 }
 
 /** Tente de verrouiller l'écran en mode paysage (supporté sur Android Chrome). */
@@ -81,7 +115,7 @@ export function isFullscreen(): boolean {
   return !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
 }
 
-/** Vérifie si le mode plein écran est disponible (ou API préfixée Webkit/Blink). */
+/** Vérifie si le mode plein écran est disponible (ou mode immersif mobile tactile). */
 export function fullscreenAvailable(): boolean {
   if (typeof document === 'undefined') return false;
   const el = document.documentElement as unknown as {
@@ -97,7 +131,9 @@ export function fullscreenAvailable(): boolean {
     mozFullScreenEnabled?: boolean;
   };
   const hasFn = !!(el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen);
-  return hasFn && doc.fullscreenEnabled !== false && doc.webkitFullscreenEnabled !== false;
+  const native = hasFn && doc.fullscreenEnabled !== false && doc.webkitFullscreenEnabled !== false;
+  // Sur appareil tactile (y compris iPhone où l'API DOM est absente), le bouton reste proposé
+  return native || isTouchDevice();
 }
 
 /** Bascule le mode plein écran. */
@@ -105,7 +141,7 @@ export function toggleFullscreen(): void {
   if (isFullscreen()) {
     exitFullscreen();
   } else {
-    enterFullscreen();
+    void enterFullscreen();
   }
 }
 
@@ -115,12 +151,14 @@ export function exitFullscreen(): void {
   const doc = document as unknown as {
     exitFullscreen?: () => Promise<void>;
     webkitExitFullscreen?: () => void;
+    webkitCancelFullScreen?: () => void;
     mozCancelFullScreen?: () => void;
     msExitFullscreen?: () => void;
   };
   try {
     if (doc.exitFullscreen) void doc.exitFullscreen().catch(() => {});
     else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen();
+    else if (doc.webkitCancelFullScreen) doc.webkitCancelFullScreen();
     else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
     else if (doc.msExitFullscreen) doc.msExitFullscreen();
   } catch {
@@ -129,49 +167,66 @@ export function exitFullscreen(): void {
 }
 
 /** Entre en plein écran si permis (supporte les variantes Webkit). */
-export function enterFullscreen(): void {
-  if (typeof document === 'undefined' || isFullscreen()) return;
-  const el = document.documentElement as unknown as {
+export async function enterFullscreen(): Promise<boolean> {
+  if (typeof document === 'undefined') return false;
+  if (isFullscreen()) return true;
+
+  const target = (document.documentElement || document.body) as HTMLElement & {
     requestFullscreen?: (opts?: { navigationUI?: string }) => Promise<void>;
-    webkitRequestFullscreen?: () => void;
-    webkitRequestFullScreen?: () => void;
-    mozRequestFullScreen?: () => void;
-    msRequestFullscreen?: () => void;
+    webkitRequestFullscreen?: () => Promise<void> | void;
+    webkitRequestFullScreen?: () => Promise<void> | void;
+    mozRequestFullScreen?: () => Promise<void> | void;
+    msRequestFullscreen?: () => Promise<void> | void;
   };
+
+  collapseMobileBars();
+
   try {
-    if (el.requestFullscreen) {
-      void el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {
-        void el.requestFullscreen?.().catch(() => {});
-      });
-    } else if (el.webkitRequestFullscreen) {
-      el.webkitRequestFullscreen();
-    } else if (el.webkitRequestFullScreen) {
-      el.webkitRequestFullScreen();
-    } else if (el.mozRequestFullScreen) {
-      el.mozRequestFullScreen();
-    } else if (el.msRequestFullscreen) {
-      el.msRequestFullscreen();
+    if (typeof target.requestFullscreen === 'function') {
+      try {
+        await target.requestFullscreen({ navigationUI: 'hide' });
+        collapseMobileBars();
+        return true;
+      } catch {
+        // En cas de rejet avec navigationUI, réessayer sans options
+        try {
+          await target.requestFullscreen();
+          collapseMobileBars();
+          return true;
+        } catch {
+          // Échec du plein écran standard
+        }
+      }
+    } else if (typeof target.webkitRequestFullscreen === 'function') {
+      await target.webkitRequestFullscreen();
+      collapseMobileBars();
+      return true;
+    } else if (typeof target.webkitRequestFullScreen === 'function') {
+      await target.webkitRequestFullScreen();
+      collapseMobileBars();
+      return true;
     }
   } catch {
-    // Ignoré si rejeté
+    // Ignoré si rejeté (ex: hors geste utilisateur)
   }
+
+  // Sur iPhone Safari ou navigateurs sans API plein écran DOM : repliement d'en-tête
+  collapseMobileBars();
+  return false;
 }
 
 /** Tente de forcer le paysage, le plein écran et le masquage des barres d'adresse/en-têtes. */
 export async function forceLandscapeAndFullscreen(): Promise<void> {
-  enterFullscreen();
+  await enterFullscreen();
   await lockLandscape();
-  if (typeof window !== 'undefined') {
-    window.scrollTo(0, 1);
-    setTimeout(() => window.scrollTo(0, 1), 60);
-    setTimeout(() => window.scrollTo(0, 1), 260);
-  }
+  collapseMobileBars();
 }
 
 class DeviceTracker {
   mode: InputMode = 'keyboard';
   private forced: InputMode | null = null;
   private readonly listeners = new Set<Listener>();
+  private readonly fsListeners = new Set<FullscreenListener>();
 
   init(): void {
     if (typeof window === 'undefined') return;
@@ -194,7 +249,6 @@ class DeviceTracker {
       (e) => {
         if (e.pointerType === 'touch' || e.pointerType === 'pen') {
           this.set('touch');
-          // Sur mobile, tenter le verrouillage paysage dès la première interaction
           void lockLandscape();
         } else if (e.pointerType === 'mouse' && this.mode !== 'touch') {
           this.set('keyboard');
@@ -203,9 +257,18 @@ class DeviceTracker {
       true,
     );
 
+    // Détection des changements de plein écran pour synchroniser l'icône et l'interface
+    const onFs = () => this.notifyFullscreen();
+    document.addEventListener('fullscreenchange', onFs);
+    document.addEventListener('webkitfullscreenchange', onFs);
+
     window.addEventListener('gamepadconnected', () => {
       this.set('gamepad');
     });
+  }
+
+  notifyFullscreen(fs: boolean = isFullscreen()): void {
+    for (const fn of this.fsListeners) fn(fs);
   }
 
   set(mode: InputMode): boolean {
@@ -220,6 +283,11 @@ class DeviceTracker {
   subscribe(fn: Listener): () => void {
     this.listeners.add(fn);
     return () => this.listeners.delete(fn);
+  }
+
+  onFullscreenChange(fn: FullscreenListener): () => void {
+    this.fsListeners.add(fn);
+    return () => this.fsListeners.delete(fn);
   }
 
   vibrate(pattern: number | number[]): void {
