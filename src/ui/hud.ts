@@ -114,11 +114,7 @@ export class Hud {
       <div class="dz-hud-bl">
         <div class="dz-traycard dz-paper">
           <div class="dz-tray">
-            <svg class="dz-tray-plate" viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true">
-              <ellipse cx="100" cy="32" rx="97" ry="25" fill="url(#dzg-silver)" stroke="#7d8794" stroke-width="1.5"/>
-              <ellipse cx="100" cy="30" rx="86" ry="18" fill="#f2f4f6" stroke="#b5bcc5" stroke-width="1"/>
-              <ellipse cx="100" cy="30" rx="80" ry="15" fill="none" stroke="#c9a24a" stroke-width="1" opacity=".7"/>
-            </svg>
+            <div class="dz-tray-surface" aria-hidden="true"></div>
             <div class="dz-tray-slots"></div>
           </div>
           <div class="dz-meters">
@@ -281,7 +277,8 @@ export class Hud {
       let slots = '';
       for (let i = 0; i < s.capacity; i++) slots += `<span class="dz-slot"><span class="dz-slot-dish"></span></span>`;
       this.traySlots.innerHTML = slots;
-      this.traySlots.style.setProperty('--n', String(Math.max(2, s.capacity)));
+      this.traySlots.style.setProperty('--tray-columns', String(Math.min(4, Math.max(1, s.capacity))));
+      this.traySlots.style.setProperty('--tray-mobile-columns', String(s.capacity <= 3 ? Math.max(1, s.capacity) : Math.ceil(s.capacity / 2)));
     }
     const trayKey = s.tray.join(',');
     if (v.tray !== trayKey) {

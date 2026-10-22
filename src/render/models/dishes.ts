@@ -37,7 +37,7 @@ const wet = (c: string): THREE.MeshStandardMaterial => stdMat(`wet:${c}`, { colo
 const cream = (): THREE.MeshStandardMaterial => stdMat('cream', { color: '#fff9f0', roughness: 0.6 });
 
 function frost(): THREE.MeshStandardMaterial {
-  return stdMat('frost', { color: '#f6fbff', roughness: 0.3, metalness: 0, transparent: true, opacity: 0.34, depthWrite: false });
+  return stdMat('frost', { color: '#e7f1ee', roughness: 0.18, metalness: 0, transparent: true, opacity: 0.46, depthWrite: false });
 }
 
 function goldGlow(): THREE.MeshStandardMaterial {
@@ -50,17 +50,17 @@ function waffleTex(linear: boolean): THREE.CanvasTexture {
     linear ? 'waffle:bump' : 'waffle',
     64,
     (c, s) => {
-      c.fillStyle = linear ? '#ffffff' : '#e7b257';
+      c.fillStyle = linear ? '#e0e0e0' : '#e7b257';
       c.fillRect(0, 0, s, s);
       const grad = c.createRadialGradient(s / 2, s / 2, 4, s / 2, s / 2, s * 0.5);
-      grad.addColorStop(0, linear ? '#c8c8c8' : '#f3c876');
-      grad.addColorStop(1, linear ? '#ffffff' : '#dda24a');
+      grad.addColorStop(0, linear ? '#484848' : '#bd7e35');
+      grad.addColorStop(1, linear ? '#c8c8c8' : '#dda24a');
       c.fillStyle = grad;
       c.fillRect(8, 8, s - 16, s - 16);
-      c.fillStyle = linear ? '#303030' : '#9b5a1c';
+      c.fillStyle = linear ? '#f0f0f0' : '#ecc27a';
       c.fillRect(0, 0, s, 7);
       c.fillRect(0, 0, 7, s);
-      c.fillStyle = linear ? '#606060' : '#b9732c';
+      c.fillStyle = linear ? '#b8b8b8' : '#d69949';
       c.fillRect(0, s - 4, s, 4);
       c.fillRect(s - 4, 0, 4, s);
     },
@@ -73,7 +73,7 @@ function waffleTex(linear: boolean): THREE.CanvasTexture {
 }
 
 function waffleMat(): THREE.MeshStandardMaterial {
-  return stdMat('waffle', { map: waffleTex(false), bumpMap: waffleTex(true), bumpScale: 1.5, roughness: 0.62 });
+  return stdMat('waffle', { map: waffleTex(false), bumpMap: waffleTex(true), bumpScale: 0.0035, roughness: 0.62 });
 }
 
 /** Latte art : cœur / rosetta de mousse sur crème de café. */
@@ -282,13 +282,57 @@ function drinkGeo(): THREE.BufferGeometry {
 
 // ─────────────────────────────────────────── Petits éléments
 
+/** Tonal detail and organic contours baked once into the existing vertices.
+ * These colors merge into the same material batches as the original ingredients. */
+function ingredientSurface(source: THREE.BufferGeometry, kind: 'bread' | 'pancake' | 'blue' | 'rasp' | 'straw' | 'leaf'): THREE.BufferGeometry {
+  return cgeo(`ingredient:${kind}:${source.uuid}`, () => {
+    const g = source.clone();
+    g.computeBoundingBox();
+    const bounds = g.boundingBox!;
+    const size = bounds.getSize(new THREE.Vector3());
+    const center = bounds.getCenter(new THREE.Vector3());
+    const p = g.getAttribute('position');
+    const colors = new Float32Array(p.count * 3);
+    for (let i = 0; i < p.count; i++) {
+      const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+      const h = (y - bounds.min.y) / Math.max(0.0001, size.y);
+      const a = Math.atan2(z, x);
+      let shade = 1;
+      if (kind === 'bread') {
+        const edge = Math.max(Math.abs(x - center.x) / (size.x / 2), Math.abs(z - center.z) / (size.z / 2));
+        shade = .76 + .20 * h - .14 * Math.min(1, edge) + .06 * Math.sin(x * 170 + z * 81);
+        p.setXYZ(i, x * (1 + .018 * Math.sin(z * 110)), y, z);
+      } else if (kind === 'pancake') {
+        const ripple = 1 + .021 * Math.sin(a * 5 + .4) + .012 * Math.cos(a * 3);
+        p.setXYZ(i, x * ripple, y + .0007 * Math.sin(a * 4) * h, z * ripple);
+        shade = .78 + .17 * Math.sin(a * 3 + .7) ** 2 + .08 * (1 - h);
+      } else if (kind === 'leaf') {
+        p.setXYZ(i, x * (.8 + .2 * Math.cos(z * 95)), y + z * z * 9, z);
+        shade = .66 + .28 * h + .06 * Math.cos(z * 90);
+      } else {
+        const ripple = kind === 'rasp' ? 1 + .10 * Math.cos(a * 3.5 + h * 7) : 1;
+        const taper = kind === 'straw' ? .58 + .42 * Math.sin(h * Math.PI * .8) : 1;
+        p.setXYZ(i, x * ripple * taper, y - (h > .85 ? (h - .85) * size.y * .7 : 0), z * ripple * taper);
+        shade = .67 + .28 * h + .09 * Math.sin(a * 3 + h * 6);
+        if (kind === 'blue' && h > .92) shade *= .48; // recessed blossom crown
+      }
+      colors.set([shade, shade * .98, shade * .94], i * 3);
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    g.computeVertexNormals();
+    g.computeBoundingBox();
+    g.computeBoundingSphere();
+    return g;
+  });
+}
+
 /** Grain minuscule (sucre glace, graines) : octaèdre de 8 triangles. */
 function grain(r: number): THREE.BufferGeometry {
   return cgeo(`grain:${r}`, () => new THREE.OctahedronGeometry(r, 0));
 }
 
 function leaf(g: THREE.Object3D, x: number, y: number, z: number, rot: number, size = 1, color = '#6ea35a'): void {
-  const l = mesh(sphere(0.012 * size, 6, 4), matte(color), x, y, z);
+  const l = mesh(ingredientSurface(sphere(0.012 * size, 6, 4), 'leaf'), stdMat(`herb:${color}`, { color, vertexColors: true, roughness: .7 }), x, y, z);
   l.scale.set(1, 0.3, 2.1);
   l.rotation.set(0.15, rot, 0.1);
   l.castShadow = false;
@@ -297,13 +341,13 @@ function leaf(g: THREE.Object3D, x: number, y: number, z: number, rot: number, s
 
 function berry(g: THREE.Object3D, kind: 'rasp' | 'blue' | 'straw', x: number, y: number, z: number): void {
   if (kind === 'blue') {
-    g.add(mesh(ball(0.0105, 7, 5), stdMat('blueberry', { color: '#3e4a7e', roughness: 0.45 }), x, y + 0.009, z));
+    g.add(mesh(ingredientSurface(ball(0.0105, 7, 5), 'blue'), stdMat('blueberry', { color: '#536487', vertexColors: true, roughness: 0.55 }), x, y + 0.009, z));
   } else if (kind === 'rasp') {
-    const b = mesh(ball(0.0125, 7, 5), matte('#d9405c'), x, y + 0.011, z);
+    const b = mesh(ingredientSurface(ball(0.0125, 7, 5), 'rasp'), stdMat('raspberry', { color: '#c73950', vertexColors: true, roughness: .7 }), x, y + 0.011, z);
     b.scale.set(1, 1.1, 1);
     g.add(b);
   } else {
-    const b = mesh(ball(0.016, 8, 6), stdMat('strawberry', { color: '#e2435a', roughness: 0.4 }), x, y + 0.012, z);
+    const b = mesh(ingredientSurface(ball(0.016, 8, 6), 'straw'), stdMat('strawberry', { color: '#d84149', vertexColors: true, roughness: 0.4 }), x, y + 0.012, z);
     b.scale.set(1, 1.25, 1);
     g.add(b);
     leaf(g, x, y + 0.03, z, 0.5, 0.6, '#5f9a48');
@@ -371,15 +415,15 @@ function buildBrioche(): THREE.Group {
   const pool = mesh(chamferCylinder(0.085, 0.085, 0.004, 0.002, 20), wet('#c9792a'), 0, PLATE_TOP - 0.002, 0);
   pool.scale.set(1, 1, 0.82);
   g.add(pool);
-  const faces = stdMat('brioche:face', { color: '#e19a3e', roughness: 0.32 });
-  const crust = matte('#a95d26');
+  const faces = stdMat('brioche:face', { color: '#e5ae59', vertexColors: true, roughness: 0.32 });
+  const crust = stdMat('bread:crust', { color: '#a95d26', vertexColors: true, roughness: .7 });
   const sugar = matte('#ffffff');
   const slices: [number, number, number, number, number][] = [
     [-0.022, PLATE_TOP, 0.012, 0.35, 0],
     [0.03, PLATE_TOP + 0.024, -0.016, -0.55, 0.22],
   ];
   slices.forEach(([x, y, z, ry, rx], si) => {
-    const sl = new THREE.Mesh(breadSliceGeo(), [faces, crust]);
+    const sl = new THREE.Mesh(ingredientSurface(breadSliceGeo(), 'bread'), [faces, crust]);
     sl.castShadow = sl.receiveShadow = true;
     sl.position.set(x, y, z);
     sl.rotation.set(rx, ry, 0, 'YXZ');
@@ -410,15 +454,15 @@ function buildPancakes(): THREE.Group {
   const pool = mesh(chamferCylinder(0.1, 0.1, 0.004, 0.002, 20), syrup, 0.008, PLATE_TOP - 0.002, 0.006);
   pool.scale.set(1, 1, 0.9);
   g.add(pool);
-  const pan = matte('#d8954a');
+  const pan = stdMat('pancake:toasted', { color: '#dca15a', vertexColors: true, roughness: .7 });
   const edge = matte('#f2d397');
   const H = 0.021;
   let y = PLATE_TOP;
   for (let i = 0; i < 4; i++) {
     const ox = (hash01(11, i) - 0.5) * 0.008;
     const oz = (hash01(12, i) - 0.5) * 0.008;
-    g.add(mesh(chamferCylinder(0.084, 0.086, H, 0.009, 16), pan, ox, y, oz));
-    g.add(mesh(flatTorus(0.083, 0.0065, 3, 16), edge, ox, y + H * 0.5, oz));
+    g.add(mesh(ingredientSurface(chamferCylinder(0.084, 0.086, H, 0.009, 16), 'pancake'), pan, ox, y, oz));
+    g.add(mesh(flatTorus(0.083, 0.0045, 3, 16), edge, ox, y + H * 0.5, oz));
     y += H - 0.001;
   }
   // nappe de sirop + coulures
@@ -506,7 +550,10 @@ function buildTiramisu(): THREE.Group {
 function buildAvotoast(): THREE.Group {
   const g = new THREE.Group();
   plate(g);
-  const toast = new THREE.Mesh(breadSliceGeo(), [matte('#e6b866'), matte('#a8642c')]);
+  const toast = new THREE.Mesh(ingredientSurface(breadSliceGeo(), 'bread'), [
+    stdMat('toast:crumb', { color: '#e6b866', vertexColors: true, roughness: .7 }),
+    stdMat('toast:crust', { color: '#a8642c', vertexColors: true, roughness: .7 }),
+  ]);
   toast.castShadow = toast.receiveShadow = true;
   toast.position.set(0, PLATE_TOP, 0);
   toast.scale.set(1.45, 0.75, 1.22);

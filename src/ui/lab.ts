@@ -99,6 +99,7 @@ interface Demo {
   rush: boolean;
   forceRush: boolean;
   tray: DishId[];
+  trayPreview?: { capacity: number; dishes: DishId[] };
   combo: number;
   expanded: boolean;
   ringActive: Partial<Record<RingId, number>>;
@@ -226,8 +227,8 @@ function tick(now: number): void {
     quotaReached: d.score >= d.quota,
     timeLeft,
     rush,
-    tray: d.tray,
-    capacity: stats.capacity,
+    tray: d.trayPreview?.dishes ?? d.tray,
+    capacity: d.trayPreview?.capacity ?? stats.capacity,
     balance: stats.balanceMax * (0.55 + 0.45 * Math.sin(d.t * 0.7)),
     balanceMax: stats.balanceMax,
     dashCharges: charges,
@@ -477,6 +478,10 @@ const groups: [string, [string, () => void][]][] = [
       ['Compte à rebours', () => void ui.countdown()],
       ['HUD · Salon de Thé', () => startDemo('salon', 23)],
       ['HUD · Coup de Feu', () => startDemo('coupdefeu', 37)],
+      ...[2, 6, 8].map((capacity): [string, () => void] => [`Plateau plein · ${capacity} plats`, () => {
+        startDemo('salon', 23);
+        if (demo) demo.trayPreview = { capacity, dishes: DISH_POOL.slice(0, capacity) };
+      }]),
       ['Ruée (mousse) on/off', () => demo && (demo.forceRush = !demo.forceRush)],
       ['Mini-carte agrandie (Tab)', () => demo && (demo.expanded = !demo.expanded)],
       ['Score → quota', () => demo && (demo.score = demo.quota - 50)],

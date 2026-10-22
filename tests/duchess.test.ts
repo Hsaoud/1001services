@@ -34,15 +34,24 @@ describe('Duchess animation model', () => {
   it('keeps detailed geometry finite and within the gameplay rendering budget', () => {
     const { fig } = buildDuchessFigure();
     compactFigure(fig);
-    let triangles = 0, meshes = 0;
+    let triangles = 0, meshes = 0, bufferBytes = 0;
     fig.root.traverse(o => {
       if (!(o instanceof Mesh)) return;
       meshes++;
       const p = o.geometry.getAttribute('position');
       expect(Array.from(p.array).every(Number.isFinite)).toBe(true);
+      const normals = o.geometry.getAttribute('normal');
+      expect(normals.count).toBe(p.count);
+      expect(Array.from(normals.array).every(Number.isFinite)).toBe(true);
+      const index = o.geometry.index!;
+      expect(Array.from(index.array as ArrayLike<number>).every(i => i >= 0 && i < p.count)).toBe(true);
+      bufferBytes += index.array.byteLength;
+      for (const name of Object.keys(o.geometry.attributes)) bufferBytes += o.geometry.getAttribute(name).array.byteLength;
       triangles += (o.geometry.index?.count ?? p.count) / 3;
     });
-    expect(meshes).toBeLessThan(55);
-    expect(triangles).toBeLessThan(180_000);
+    // The realism pass must stay below the former 42 batches / 139,107 triangles.
+    expect(meshes).toBeLessThanOrEqual(36);
+    expect(triangles).toBeLessThan(115_000);
+    expect(bufferBytes).toBeLessThan(2_000_000);
   });
 });

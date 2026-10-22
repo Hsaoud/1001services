@@ -11,7 +11,7 @@ import { createDishMesh } from '../models/dishes';
 import { chamferCylinder, disposeTree, lathe, roundedBox, sphere, torus, cylinder } from '../kit';
 import { M } from '../batch';
 import { vc, vcGlass, vcGlow } from '../mats';
-import { box, cone, flowerGeo, leafGeo } from '../geo';
+import { box, cone, flowerGeo, leafGeo, rectangularTableclothGeo, tableclothGeo } from '../geo';
 import { SPRITE } from '../textures';
 import type { SalonCtx } from './context';
 import { rand, seedOf } from './context';
@@ -77,19 +77,7 @@ export function buildTable(ctx: SalonCtx, t: TableSpec): View<TableViewState> {
       // nappe tombante (tour) + plateau
       const R0 = rad + 0.02;
       batch.add(
-        lathe(
-          [
-            [R0 + 0.08, 0.06],
-            [R0 + 0.085, 0.08],
-            [R0 + 0.06, 0.25],
-            [R0 + 0.02, top - 0.05],
-            [R0, top - 0.01],
-            [R0 - 0.02, top],
-            [0, top],
-          ],
-          32,
-          `cloth:${R0}`,
-        ),
+        tableclothGeo(R0, top),
         satin,
         null,
         { color: clothCol },
@@ -99,8 +87,8 @@ export function buildTable(ctx: SalonCtx, t: TableSpec): View<TableViewState> {
       // napperon / chemin
       batch.add(chamferCylinder(rad * 0.62, rad * 0.62, 0.006, 0.002, 28), satin, M(0, top, 0), { color: t.vip ? metal : style.accent, cast: false });
     } else {
-      batch.add(roundedBox(t.w + 0.08, top - 0.12, t.d + 0.08, 0.04, 2), satin, M(0, 0.12 + (top - 0.12) / 2, 0), { color: clothCol });
-      batch.add(roundedBox(t.w + 0.1, 0.02, t.d + 0.1, 0.008, 1), satin, M(0, 0.13, 0), { color: t.vip ? metal : style.accent, cast: false });
+      batch.add(rectangularTableclothGeo(t.w, t.d, top), satin, null, { color: clothCol });
+      batch.add(rectangularTableclothGeo(t.w, t.d, top, true), satin, null, { color: t.vip ? metal : style.accent, cast: false });
       // chemin de table
       const along = t.w >= t.d;
       batch.add(box(along ? t.w + 0.1 : 0.32, 0.006, along ? 0.32 : t.d + 0.1), satin, M(0, top + 0.003, 0), { color: t.vip ? metal : style.accent, cast: false });

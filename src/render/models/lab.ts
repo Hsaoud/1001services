@@ -154,11 +154,13 @@ function focus(name: string): void {
 
 // ─────────────────────────────────────────── Plats
 
+const dishModels = new Map<DishId, THREE.Object3D>();
 DISH_IDS.forEach((id, i) => {
   const x = (i - (DISH_IDS.length - 1) / 2) * 0.55;
   const ped = mesh(chamferCylinder(0.17, 0.19, 0.04, 0.012), ceramic(PALETTE.cream), x, 0, -4);
   scene.add(ped);
   const d = createDishMesh(id);
+  dishModels.set(id, d);
   d.position.set(x, 0.04, -4);
   scene.add(d);
 });
@@ -573,6 +575,24 @@ setInterval(() => {
   }
 }, 500);
 cam.target.copy(cam.goal);
+// Optional, visible diagnostics for comparing identical lab views before/after an art pass.
+const budget = document.createElement('pre');
+budget.id = 'render-budget';
+budget.style.cssText = 'position:fixed;bottom:30px;left:12px;padding:12px;background:#fffdf3ee;color:#382b29;font:12px monospace;pointer-events:none;z-index:10';
+document.body.append(budget);
+function modelBudget(root: THREE.Object3D, prefix = ''): string {
+  let meshes = 0, triangles = 0, bytes = 0;
+  root.traverse(o => {
+    if (!(o instanceof THREE.Mesh) || !o.name.startsWith(prefix)) return;
+    meshes++;
+    const g = o.geometry;
+    triangles += (g.index?.count ?? g.getAttribute('position').count) / 3;
+    for (const name of Object.keys(g.attributes)) bytes += g.getAttribute(name).array.byteLength;
+    bytes += g.index?.array.byteLength ?? 0;
+  });
+  return `${meshes} meshes | ${triangles} triangles | ${bytes} bytes`;
+}
+let budgetRefresh = 0;
 const timer = new THREE.Timer();
 let time = 0;
 function frame(): void {
@@ -593,6 +613,15 @@ function frame(): void {
   updateNpcs(dt, time);
   updateClients(dt, time);
   renderer.render(scene, camera);
+  budget.hidden = new URLSearchParams(location.hash.slice(1)).get('stats') !== '1';
+  if (!budget.hidden && ++budgetRefresh % 30 === 0) {
+    const sculpt = player.root.getObjectByName('Duchess / Blender sculpt')!;
+    budget.textContent = [
+      `Frame: ${renderer.info.render.calls} calls | ${renderer.info.render.triangles} triangles`,
+      `Duchesse: ${modelBudget(sculpt, 'Blender /')}`,
+      ...[...dishModels].map(([id, root]) => `${id}: ${modelBudget(root)}`),
+    ].join('\n');
+  }
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -638,6 +667,7 @@ function applyHash(): void {
   if (q.get('fall') === '1') pctl.fallTime = 0;
   if (q.get('bell') === '1') pctl.bellTime = 0;
   if (q.has('pmode')) pctl.mode = q.get('pmode') as typeof pctl.mode;
+  if (q.has('heading')) ps.heading = num('heading', 0);
   if (q.has('bal')) ps.balance01 = num('bal', 1);
   if (q.has('cap')) ps.capacity = num('cap', 4);
   if (q.has('tray')) ps.tray = (q.get('tray') || '').split(',').filter(Boolean) as DishId[];

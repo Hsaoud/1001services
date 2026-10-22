@@ -3,7 +3,7 @@
  * feuilles, arcs, profils tournés. Les géométries réutilisables sont mises en cache.
  */
 import * as THREE from 'three';
-import { lathe } from './kit';
+import { lathe, roundedBox } from './kit';
 
 export type V3 = [number, number, number];
 
@@ -373,12 +373,17 @@ export function leafGeo(len: number, wid: number, curl = 0.25): THREE.BufferGeom
     const pos: number[] = [];
     const uv: number[] = [];
     const idx: number[] = [];
+    const col: number[] = [];
     for (let i = 0; i <= seg; i++) {
       const t = i / seg;
       const w = Math.sin(Math.PI * Math.min(1, t * 1.05)) * wid * 0.5 * (1 - t * 0.25);
       const y = t * len;
       const z = Math.sin(t * Math.PI * 0.5) * curl * len * t;
-      pos.push(-w, y, z, 0, y, z - wid * 0.12, w, y, z);
+      const rib = Math.sin(t * Math.PI) * wid * .14;
+      const twist = Math.sin(t * Math.PI) * wid * .06;
+      pos.push(-w, y, z + twist, 0, y, z - rib, w, y, z - twist);
+      const shade = .70 + .25 * Math.sin(t * Math.PI * .8);
+      col.push(shade * .91, shade, shade * .86, shade, Math.min(1, shade + .08), shade * .90, shade * .91, shade, shade * .86);
       uv.push(0, t, 0.5, t, 1, t);
     }
     for (let i = 0; i < seg; i++) {
@@ -389,6 +394,7 @@ export function leafGeo(len: number, wid: number, curl = 0.25): THREE.BufferGeom
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     g.setIndex(idx);
     g.computeVertexNormals();
     return g;
@@ -400,13 +406,17 @@ export function bushGeo(r: number, seed = 1): THREE.BufferGeometry {
   return cachedGeo(`bush:${r}:${seed}`, () => {
     const g = new THREE.IcosahedronGeometry(r, 1);
     const p = g.attributes.position;
+    const col = new Float32Array(p.count * 3);
     for (let i = 0; i < p.count; i++) {
       const x = p.getX(i);
       const y = p.getY(i);
       const z = p.getZ(i);
       const n = 1 + 0.14 * Math.sin(x * 9.1 + seed) * Math.cos(z * 7.3 + seed * 2) + 0.08 * Math.sin(y * 11 + seed);
       p.setXYZ(i, x * n, y * n * 0.92, z * n);
+      const shade = .64 + .25 * (y / r + 1) / 2 + .09 * Math.sin(x / r * 8 + seed) ** 2;
+      col.set([shade * .94, shade, shade * .88], i * 3);
     }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
     g.computeVertexNormals();
     return g;
   });
@@ -417,13 +427,64 @@ export function flowerGeo(r: number): THREE.BufferGeometry {
   return cachedGeo(`flower:${r}`, () => {
     const g = new THREE.SphereGeometry(r, 10, 6, 0, Math.PI * 2, 0, Math.PI * 0.6);
     const p = g.attributes.position;
+    const col = new Float32Array(p.count * 3);
     for (let i = 0; i < p.count; i++) {
       const x = p.getX(i);
       const z = p.getZ(i);
       const a = Math.atan2(z, x);
-      const k = 1 + 0.18 * Math.cos(a * 5);
-      p.setXYZ(i, x * k, p.getY(i) * 0.75, z * k);
+      const k = 1 + 0.22 * Math.cos(a * 5);
+      const rim = Math.hypot(x, z) / r;
+      p.setXYZ(i, x * k, p.getY(i) * .58 + rim * rim * .12 * r, z * k);
+      const shade = .72 + .25 * rim + .03 * Math.cos(a * 5);
+      col.set([shade, shade * .97, shade * .96], i * 3);
     }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.computeVertexNormals();
+    return g;
+  });
+}
+
+/** Pleated table linen, using the same topology as the former smooth lathe. */
+export function tableclothGeo(radius: number, height: number): THREE.BufferGeometry {
+  return cachedGeo(`cloth:${radius}:${height}`, () => {
+    const g = lathe([[radius + .08, .06], [radius + .085, .08], [radius + .06, .25],
+      [radius + .02, height - .05], [radius, height - .01], [radius - .02, height], [0, height]], 32);
+    const p = g.getAttribute('position');
+    const col = new Float32Array(p.count * 3);
+    for (let i = 0; i < p.count; i++) {
+      const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+      const a = Math.atan2(z, x);
+      const drop = Math.max(0, (height - y) / height);
+      const wave = Math.cos(a * 8 + .25);
+      const fold = 1 + .025 * wave * drop;
+      p.setXYZ(i, x * fold, y, z * fold);
+      const shade = 1 - drop * (.05 + .07 * (1 - wave) / 2);
+      col.set([shade, shade, shade], i * 3);
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.computeVertexNormals();
+    return g;
+  });
+}
+
+/** Soft folds in square table linen and its matching hem, without extra faces. */
+export function rectangularTableclothGeo(w: number, d: number, top: number, hem = false): THREE.BufferGeometry {
+  return cachedGeo(`rectCloth:${w}:${d}:${top}:${hem}`, () => {
+    const height = hem ? .02 : top - .12;
+    const g = roundedBox(w + (hem ? .1 : .08), height, d + (hem ? .1 : .08), hem ? .008 : .04, hem ? 1 : 2).clone();
+    g.translate(0, .12 + height / 2, 0);
+    const p = g.getAttribute('position');
+    const colors = new Float32Array(p.count * 3);
+    for (let i = 0; i < p.count; i++) {
+      const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+      const drop = Math.max(0, (top - y) / (top - .12));
+      const fx = Math.cos(z / d * Math.PI * 8 + .3);
+      const fz = Math.cos(x / w * Math.PI * 8 + .3);
+      p.setXYZ(i, x * (.98 + .02 * drop + .014 * fx * drop), y + .004 * drop ** 3 * (fx + fz), z * (.98 + .02 * drop + .014 * fz * drop));
+      const shade = 1 - drop * (.04 + .035 * (2 - fx - fz));
+      colors.set([shade, shade, shade], i * 3);
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     g.computeVertexNormals();
     return g;
   });

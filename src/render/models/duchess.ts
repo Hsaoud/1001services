@@ -10,7 +10,7 @@ interface SculptMaterial {
   color: string; roughness: number; metalness: number; sheen: number; coat: number; vertexColors?: boolean;
 }
 interface SculptMesh {
-  part: string; material: string; position: string; normal: string; color: string | null; index: string;
+  part: string; material: string; position: string; normal: string; color: string | null; index: string; indexType?: 'uint16' | 'uint32';
 }
 interface SculptAsset {
   generator: string; positionScale: number;
@@ -48,10 +48,10 @@ function getTemplate(): SculptTemplate {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(
       Float32Array.from(positions, v => v * asset.positionScale), 3));
-    geometry.setAttribute('normal', new THREE.Float32BufferAttribute(
-      Float32Array.from(normals, v => v / 32767), 3));
+    geometry.setAttribute('normal', new THREE.Int16BufferAttribute(normals, 3, true));
     if (source.color) geometry.setAttribute('color', new THREE.Uint8BufferAttribute(bytes(source.color), 3, true));
-    geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(bytes(source.index).buffer), 1));
+    const indexBytes = bytes(source.index).buffer;
+    geometry.setIndex(new THREE.BufferAttribute(source.indexType === 'uint16' ? new Uint16Array(indexBytes) : new Uint32Array(indexBytes), 1));
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     geometry.userData.shared = true;
