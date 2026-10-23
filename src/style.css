@@ -22,6 +22,29 @@ body {
   touch-action: none;
 }
 
+/* A real document scroll is required for Safari to retract its browser controls.
+   Keep this geometry after entering: changing body overflow can bring them back. */
+html[data-native-scroll='true'],
+html[data-native-scroll='true'] body {
+  height: auto;
+  min-height: 175vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  touch-action: pan-y;
+  scrollbar-width: none;
+}
+
+html[data-native-scroll='true']::-webkit-scrollbar,
+html[data-native-scroll='true'] body::-webkit-scrollbar {
+  display: none;
+}
+
+html[data-entrance='waiting'] #app.duchesse-root,
+html[data-entrance='waiting'] .dz-root {
+  overflow: visible;
+  touch-action: pan-y;
+}
+
 .duchesse-root .game-layer {
   position: absolute;
   inset: 0;

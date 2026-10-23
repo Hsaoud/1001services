@@ -15,6 +15,7 @@ import './menus.css';
 import './service.css';
 import './touch.css';
 import './readability.css';
+import './entrance.css';
 
 import type {
   BubbleState,
@@ -50,6 +51,7 @@ import { showFailCard, showFinaleCard, showResultsCard } from './results';
 import { createSettings } from './settings';
 import { createTitle } from './title';
 import { createWardrobe } from './wardrobe';
+import { createEntrance } from './entrance';
 
 export class UI implements UiApi {
   readonly root: HTMLElement;
@@ -149,10 +151,14 @@ export class UI implements UiApi {
       const c = info.modes.coupdefeu;
       this.ctx.titleMode = c.unlocked > s.unlocked ? 'coupdefeu' : 'salon';
     }
-    const scr = createTitle(this.ctx, info, h);
-    if (this.title && this.stack.has(this.title)) this.stack.replace(this.title, scr);
-    else this.stack.push(scr, false);
-    this.title = scr;
+    const reveal = () => {
+      const scr = createTitle(this.ctx, info, h);
+      if (this.title && this.stack.has(this.title)) this.stack.replace(this.title, scr);
+      else this.stack.push(scr, false);
+      this.title = scr;
+    };
+    if (first) this.stack.push(createEntrance(this.ctx, reveal), false);
+    else reveal();
   }
 
   hideTitle(): void {
