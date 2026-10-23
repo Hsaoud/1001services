@@ -64,7 +64,10 @@ export function createTitle(ctx: UiCtx, info: TitleInfo, h: TitleHandlers): Scre
       </div>
       <footer class="dz-title-foot">
         <div class="dz-title-keys"><span class="dz-key">↑</span><span class="dz-key">↓</span> choisir <span class="dz-dot">·</span> <span class="dz-key">Entrée</span> servir</div>
-        <div class="dz-title-credit">Inspiré de <em>La Duchesse</em>, brunch à Toulouse <span class="dz-dot">·</span> @laduchesse.31</div>
+        <div class="dz-title-credit">
+          <div>Inspiré de <em>La Duchesse</em>, brunch à Toulouse <span class="dz-dot">·</span> <a href="https://www.instagram.com/laduchesse.31/?hl=fr" target="_blank" rel="noopener noreferrer">@laduchesse.31</a></div>
+          <div>Jeu créé par <a href="https://www.instagram.com/hichem.saoud.75/?hl=fr" target="_blank" rel="noopener noreferrer">Hichem Saoud</a> <span class="dz-dot">·</span> <a href="https://www.instagram.com/hichem.saoud.75/?hl=fr" target="_blank" rel="noopener noreferrer">@hichem.saoud.75</a></div>
+        </div>
       </footer>
     </section>
   </div>`);

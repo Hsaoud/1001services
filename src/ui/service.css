@@ -591,6 +591,21 @@
   color: var(--ink-faint);
 }
 
+.dz-bill-insta a {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.dz-bill-insta a:hover {
+  color: var(--rose-4);
+  text-decoration: underline;
+  text-decoration-color: var(--rose-4);
+  text-underline-offset: 2px;
+}
+
+
 .dz-bill-stamp {
   position: absolute;
   right: calc(var(--u) * -6.8);

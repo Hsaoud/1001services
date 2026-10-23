@@ -1,7 +1,6 @@
 # Les 1001 Services de La Duchesse
 
-Jeu d'adresse, de vitesse et de service en diorama 3D (Three.js), inspiré du restaurant brunch
-**La Duchesse** à Toulouse. Vous incarnez le Maître d'Hôtel : prenez les spécialités aux comptoirs,
+Jeu d'adresse, de vitesse et de service en diorama 3D (Three.js), créé par [Hichem Saoud](https://www.instagram.com/hichem.saoud.75/?hl=fr) et inspiré du restaurant brunch [**La Duchesse** (@laduchesse.31)](https://www.instagram.com/laduchesse.31/?hl=fr) à Toulouse. Vous incarnez le Maître d'Hôtel : prenez les spécialités aux comptoirs,
 servez les bonnes tables avant que leur patience dorée ne s'épuise, esquivez l'agitation du salon
 d'un Pas Chassé… puis sonnez la Cloche Royale.
 

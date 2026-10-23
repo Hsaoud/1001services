@@ -79,6 +79,12 @@
   outline: none;
 }
 
+:where(.dz-root) :where(a) {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 :root:not([data-input='touch']) .dz-root :focus-visible {
   outline: 2px solid var(--gold-ink);
   outline-offset: 3px;

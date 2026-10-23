@@ -50,7 +50,7 @@ export function showResultsCard(ctx: UiCtx, r: ServiceResult): Promise<void> {
         </div>
         ${r.success ? '' : `<div class="dz-bill-inkrow"><div class="dz-stamp-ink"><span class="dz-caps">Service manqué</span><small>à reprendre</small></div></div>`}
         <div class="dz-bill-thanks dz-script">${r.success ? 'Merci de votre élégance' : 'La Duchesse compte sur vous'}</div>
-        <div class="dz-bill-insta">@laduchesse.31</div>
+        <div class="dz-bill-insta"><a href="https://www.instagram.com/laduchesse.31/?hl=fr" target="_blank" rel="noopener noreferrer">@laduchesse.31</a></div>
       </article>
         ${
           r.success

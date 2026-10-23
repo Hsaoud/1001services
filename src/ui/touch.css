@@ -653,7 +653,7 @@
   :root[data-input='touch'] .dz-t-script { font-size: 38px; }
   :root[data-input='touch'] .dz-tagline { grid-column: 1; grid-row: 3; font-size: 14px; margin: 0; }
   :root[data-input='touch'] .dz-title-foot { grid-column: 1; grid-row: 4; margin: 0; padding: 0; }
-  :root[data-input='touch'] .dz-title-credit { font-size: 11px; }
+  :root[data-input='touch'] .dz-title-credit { font-size: 11px; gap: 2px; }
   :root[data-input='touch'] .dz-title :is(.dz-title-crown, .dz-title-art, .dz-fleuron-wrap) { display: none; }
   :root[data-input='touch'] .dz-mi { padding: 6px 10px; }
   :root[data-input='touch'] .dz-mi-name { font-size: 20px; }

@@ -368,6 +368,28 @@
   font-size: max(12px, calc(var(--u) * 1.1));
 }
 
+.dz-title-credit {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 0.25);
+  align-items: center;
+  line-height: 1.35;
+}
+
+.dz-title-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(91, 31, 42, 0.35);
+  text-underline-offset: 2px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  cursor: pointer;
+}
+
+.dz-title-credit a:hover {
+  color: var(--rose-4);
+  text-decoration-color: var(--rose-4);
+}
+
 .dz-title-credit em {
   color: var(--ink-2);
 }
