@@ -237,6 +237,7 @@ export const ICON = {
   hanger: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.4V7.2c1.6-.4 2.4-1.4 2.4-2.6A2.4 2.4 0 0 0 12 2.2c-1.2 0-2.2.8-2.4 2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 8.4 2.6 15.6c-.8.6-.4 1.9.6 1.9h17.6c1 0 1.4-1.3.6-1.9z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
   menu: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8.5 8h7M8.5 11.5h7M8.5 15h4.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M12 4.6l.7 1.2-.7 1.2-.7-1.2z" fill="currentColor"/></svg>`,
   gear: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14M5 12h14M5 17.5h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="9" cy="6.5" r="2.2" fill="#fbf3e8" stroke="currentColor" stroke-width="1.4"/><circle cx="15.5" cy="12" r="2.2" fill="#fbf3e8" stroke="currentColor" stroke-width="1.4"/><circle cx="7.5" cy="17.5" r="2.2" fill="#fbf3e8" stroke="currentColor" stroke-width="1.4"/></svg>`,
+  play: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>`,
 };
 
 /** Illustrations des catégories de nouveautés (carte « Nouveauté »). */

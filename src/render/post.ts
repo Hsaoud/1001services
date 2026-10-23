@@ -14,6 +14,7 @@ import { FXAAPass } from 'three/examples/jsm/postprocessing/FXAAPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import type { Settings } from '../types';
 import type { BiomeStyle } from './biomes';
+import { isHandheld } from '../core/device';
 
 const FinishShader = {
   name: 'DuchesseFinish',
@@ -144,6 +145,10 @@ export class PostPipeline {
       this.composer.setPixelRatio(pixelRatio);
       this.composer.setSize(w, h);
     }
+    if (this.bloom) {
+      const bloomScale = isHandheld() ? 4 : 2;
+      this.bloom.setSize(Math.max(1, Math.round(w / bloomScale)), Math.max(1, Math.round(h / bloomScale)));
+    }
     if (this.finish) this.finish.uniforms.uAspect.value = w / Math.max(1, h);
   }
 
@@ -154,12 +159,25 @@ export class PostPipeline {
       return;
     }
     const high = this.quality === 'high';
-    const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: high ? 4 : 0 });
+    const handheld = isHandheld();
+    // Sur GPU mobile tile-based, le MSAA (samples: 4) sur cible HalfFloat sature la bande passante
+    // et provoque des débordements en RAM système. L'anti-aliasing FXAA sur écran Retina haute densité
+    // offre un lissage irréprochable en une seule passe légère sans goulot d'étranglement.
+    const samples = high && !handheld ? 4 : 0;
+    const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples });
     const composer = new EffectComposer(this.renderer, rt);
     composer.setPixelRatio(this.pixelRatio);
     composer.setSize(this.width, this.height);
     composer.addPass(new RenderPass(this.scene, this.camera, undefined, new THREE.Color(0, 0, 0), 0));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(this.width / 2, this.height / 2), 0.3, 0.5, 1.2);
+
+    // Résolution du bloom : un sous-échantillonnage 1/4 sur mobile est plus soyeux, plus diffus et 4× plus rapide
+    const bloomScale = handheld ? 4 : 2;
+    this.bloom = new UnrealBloomPass(
+      new THREE.Vector2(Math.max(1, Math.round(this.width / bloomScale)), Math.max(1, Math.round(this.height / bloomScale))),
+      0.3,
+      0.5,
+      1.2,
+    );
     // ajoute le halo à la couleur sans toucher à l'alpha (le fond reste transparent)
     const bm = this.bloom.blendMaterial;
     bm.blending = THREE.CustomBlending;
@@ -173,10 +191,11 @@ export class PostPipeline {
     this.finish = new ShaderPass(FinishShader);
     this.finish.uniforms.uAspect.value = this.width / Math.max(1, this.height);
     composer.addPass(this.finish);
-    composer.addPass(high ? new SMAAPass() : new FXAAPass());
+    composer.addPass(high && !handheld ? new SMAAPass() : new FXAAPass());
     this.composer = composer;
     this.applyParams();
   }
+
 
   private applyParams(): void {
     // fond : composé en finition (composer) ou dessiné par la scène (rendu direct)

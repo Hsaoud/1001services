@@ -40,6 +40,29 @@ export function isHandheld(): boolean {
   return isIOS() || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
 }
 
+/**
+ * Détecte les puces graphiques mobiles d'entrée / milieu de gamme (ex. Xiaomi Redmi Note,
+ * Poco M, Galaxy A : Snapdragon 680/685/695 avec Adreno 610/619 ou Helio G88/G99 avec Mali-G52/G57).
+ */
+let cachedMidTierGpu: boolean | null = null;
+export function isMidTierMobile(): boolean {
+  if (cachedMidTierGpu !== null) return cachedMidTierGpu;
+  if (!isHandheld()) return (cachedMidTierGpu = false);
+  if (typeof document === 'undefined') return (cachedMidTierGpu = false);
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl2') || c.getContext('webgl');
+    if (!gl) return (cachedMidTierGpu = false);
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    if (!dbg) return (cachedMidTierGpu = false);
+    const r = (gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || '').toLowerCase();
+    cachedMidTierGpu = /mali-g5[127]|mali-g31|mali-t|adreno.*(50[0-9]|61[0-2]|702)|powervr/i.test(r);
+    return cachedMidTierGpu;
+  } catch {
+    return (cachedMidTierGpu = false);
+  }
+}
+
 /** Vérifie si l'écran est actuellement orienté en portrait. */
 export function isPortrait(): boolean {
   if (typeof window === 'undefined') return false;

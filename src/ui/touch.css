@@ -656,6 +656,10 @@
   :root[data-input='touch'] .dz-title-credit { font-size: 11px; gap: 2px; }
   :root[data-input='touch'] .dz-title :is(.dz-title-crown, .dz-title-art, .dz-fleuron-wrap) { display: none; }
   :root[data-input='touch'] .dz-mi { padding: 6px 10px; }
+  :root[data-input='touch'] .dz-mi-mode { padding: 8px 12px; margin-bottom: 5px; }
+  :root[data-input='touch'] .dz-mi-mode .dz-mi-ico { width: 26px; height: 26px; padding: 4px; }
+  :root[data-input='touch'] .dz-mi-mode .dz-mi-name { font-size: 19px; }
+  :root[data-input='touch'] .dz-mi-play { width: 24px; height: 24px; margin-left: 5px; }
   :root[data-input='touch'] .dz-mi-name { font-size: 20px; }
   :root[data-input='touch'] .dz-mi-sub .dz-mi-name { font-size: 16px; white-space: normal; }
   :root[data-input='touch'] :is(.dz-mi-price, .dz-mi-desc) { font-size: 13px; }

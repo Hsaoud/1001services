@@ -37,12 +37,12 @@ export function createTitle(ctx: UiCtx, info: TitleInfo, h: TitleHandlers): Scre
       <div class="dz-fleuron-wrap">${fleuron()}</div>
       <nav class="dz-title-menu">
         <button class="dz-mi dz-mi-mode" data-nav data-mode="salon">
-          <span class="dz-mi-row"><span class="dz-mi-ico">${ICON.teacup}</span><span class="dz-mi-name">Salon de Thé</span><span class="dz-mi-dots"></span><span class="dz-mi-price">${sl.price}</span></span>
+          <span class="dz-mi-row"><span class="dz-mi-ico">${ICON.teacup}</span><span class="dz-mi-name">Salon de Thé</span><span class="dz-mi-dots"></span><span class="dz-mi-price">${sl.price}</span><span class="dz-mi-play" aria-hidden="true">${ICON.play}</span></span>
           <span class="dz-mi-desc"><em>Histoire</em> — le service en douceur, sans minuteur</span>
           <span class="dz-mi-meta"><span class="dz-mi-prog"><i style="width:${(sl.progress * 100).toFixed(1)}%"></i></span>${esc(sl.meta)}</span>
         </button>
         <button class="dz-mi dz-mi-mode" data-nav data-mode="coupdefeu">
-          <span class="dz-mi-row"><span class="dz-mi-ico dz-fire">${ICON.fire}</span><span class="dz-mi-name">Coup de Feu</span><span class="dz-mi-dots"></span><span class="dz-mi-price">${cf.price}</span></span>
+          <span class="dz-mi-row"><span class="dz-mi-ico dz-fire">${ICON.fire}</span><span class="dz-mi-name">Coup de Feu</span><span class="dz-mi-dots"></span><span class="dz-mi-price">${cf.price}</span><span class="dz-mi-play" aria-hidden="true">${ICON.play}</span></span>
           <span class="dz-mi-desc"><em>Défi</em> — contre la montre… gare à la marée de mousse&nbsp;!</span>
           <span class="dz-mi-meta"><span class="dz-mi-prog"><i style="width:${(cf.progress * 100).toFixed(1)}%"></i></span>${esc(cf.meta)}</span>
         </button>

@@ -187,6 +187,105 @@
   width: 100%;
 }
 
+/* ─────────── Boutons de Mode (Lancement du jeu) */
+
+.dz-mi-mode {
+  background: linear-gradient(135deg, rgba(255, 252, 246, 0.94) 0%, rgba(248, 237, 224, 0.88) 100%);
+  border: 1.5px solid rgba(201, 162, 74, 0.45);
+  border-radius: calc(var(--u) * 0.9);
+  padding: calc(var(--u) * 0.85) calc(var(--u) * 1.5);
+  margin-bottom: calc(var(--u) * 0.45);
+  box-shadow:
+    0 2px 8px rgba(91, 31, 42, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--ease-out),
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.dz-mi-mode .dz-mi-row {
+  align-items: center;
+}
+
+.dz-mi-mode .dz-mi-ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--u) * 3);
+  height: calc(var(--u) * 3);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fffdf8, #f5e2cb);
+  border: 1px solid rgba(201, 162, 74, 0.5);
+  box-shadow: 0 1px 4px rgba(91, 31, 42, 0.1);
+  padding: calc(var(--u) * 0.45);
+}
+
+.dz-mi-mode .dz-mi-name {
+  font-size: calc(var(--u) * 2.7);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.dz-mi-play {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--u) * 2.8);
+  height: calc(var(--u) * 2.8);
+  margin-left: calc(var(--u) * 0.5);
+  border-radius: 50%;
+  background: var(--foil);
+  color: #fffaf0;
+  box-shadow:
+    0 2px 6px rgba(138, 100, 32, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform 0.25s var(--ease-back), box-shadow 0.25s ease;
+}
+
+.dz-mi-play svg {
+  width: 55%;
+  height: 55%;
+  transform: translateX(1px);
+  filter: drop-shadow(0 1px 1px rgba(91, 31, 42, 0.45));
+}
+
+.dz-mi-mode.dz-sel,
+.dz-mi-mode:hover,
+.dz-mi-mode.dz-f {
+  background: linear-gradient(135deg, #fffdf8 0%, #faefe0 100%);
+  border-color: var(--gold-2);
+  transform: translateX(calc(var(--u) * 0.4)) scale(1.015);
+  animation: dz-play-pulse 2.2s ease-in-out infinite;
+}
+
+.dz-mi-mode.dz-sel .dz-mi-play,
+.dz-mi-mode:hover .dz-mi-play,
+.dz-mi-mode.dz-f .dz-mi-play {
+  transform: scale(1.15);
+  box-shadow:
+    0 0 12px rgba(201, 162, 74, 0.75),
+    0 2px 8px rgba(138, 100, 32, 0.5);
+}
+
+@keyframes dz-play-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1.5px var(--gold-2),
+      0 4px 14px rgba(201, 162, 74, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2.5px var(--gold-3),
+      0 6px 24px rgba(201, 162, 74, 0.58),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+}
+
 .dz-mi-sub {
   flex-direction: row;
   align-items: baseline;

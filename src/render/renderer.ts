@@ -36,6 +36,7 @@ import { TideLayer } from './tide';
 import { SalonViewImpl } from './salon';
 import { WALL_H } from './salon/grid';
 import { fixAdditiveBlending } from './blend';
+import { isHandheld, isMidTierMobile } from '../core/device';
 
 const QUALITY: Record<Settings['quality'], { pixelRatio: number; shadow: number; radius: number; aniso: number }> = {
   low: { pixelRatio: 1, shadow: 1024, radius: 2, aniso: 2 },
@@ -82,11 +83,24 @@ export class GameRenderer implements GameRendererApi {
   private height = 1;
   private showcase = false;
   private blendCheck = 0;
+  private targetDpr = 1;
+  private currentDpr = 1;
+  private dprScale = 1.0;
+  private avgDt = 0.016;
+  private dynamicTimer = 0;
+  private handheld = false;
 
   constructor(container: HTMLElement) {
     this.container = container;
     if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
-    const gl = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance', stencil: false });
+    const gl = new THREE.WebGLRenderer({
+      antialias: false,
+      alpha: false,
+      powerPreference: 'high-performance',
+      stencil: false,
+      depth: true,
+      preserveDrawingBuffer: false,
+    });
     gl.outputColorSpace = THREE.SRGBColorSpace;
     gl.toneMapping = THREE.ACESFilmicToneMapping;
     gl.toneMappingExposure = 1.0;
@@ -313,19 +327,32 @@ export class GameRenderer implements GameRendererApi {
   setQuality(q: Settings['quality']): void {
     this.quality = q;
     const Q = QUALITY[q];
-    const dpr = Math.min(window.devicePixelRatio || 1, Q.pixelRatio);
-    this.webglRenderer.setPixelRatio(dpr);
+    this.handheld = isHandheld();
+    const midTier = isMidTierMobile();
+    // Sur mobile milieu de gamme (ex. Xiaomi Redmi Note avec Adreno 610/619 ou Mali-G52/G57),
+    // un DPR de 1.45 sur écran 1080p offre une netteté visuelle parfaite sans saturer la bande passante GPU.
+    const mobileHighDpr = midTier ? 1.45 : 1.75;
+    const maxRatio = this.handheld ? (q === 'high' ? mobileHighDpr : q === 'medium' ? 1.3 : 1) : Q.pixelRatio;
+    this.targetDpr = Math.min(window.devicePixelRatio || 1, maxRatio);
+    this.currentDpr = this.targetDpr;
+    this.dprScale = 1.0;
+    this.webglRenderer.setPixelRatio(this.currentDpr);
+
     const sh = this.sun.shadow;
-    if (sh.mapSize.x !== Q.shadow) {
-      sh.mapSize.set(Q.shadow, Q.shadow);
+    const shadowSize = this.handheld ? (midTier ? 1024 : (q === 'high' ? 1536 : 1024)) : Q.shadow;
+    if (sh.mapSize.x !== shadowSize) {
+      sh.mapSize.set(shadowSize, shadowSize);
       sh.map?.dispose();
       sh.map = null;
     }
-    sh.radius = Q.radius;
-    setMaxAnisotropy(Math.min(Q.aniso, this.webglRenderer.capabilities.getMaxAnisotropy()));
+    sh.radius = this.handheld ? (midTier ? 2.2 : (q === 'high' ? 3 : 2)) : Q.radius;
+    const anisoMax = this.handheld ? (midTier ? 2 : 4) : Q.aniso;
+    setMaxAnisotropy(Math.min(anisoMax, this.webglRenderer.capabilities.getMaxAnisotropy()));
     this.post.setQuality(q);
-    this.post.setSize(this.width, this.height, dpr);
+    this.post.setSize(this.width, this.height, this.currentDpr);
   }
+
+
 
   setRush(amount: number): void {
     this.rushTarget = Math.max(0, Math.min(1, amount));
@@ -354,7 +381,7 @@ export class GameRenderer implements GameRendererApi {
     this.height = h;
     this.webglRenderer.setSize(w, h, false);
     this.rig.resize(w, h);
-    this.post.setSize(w, h, this.webglRenderer.getPixelRatio());
+    this.post.setSize(w, h, this.currentDpr);
   }
 
   // ─────────────────────────────────────── Image
@@ -396,6 +423,34 @@ export class GameRenderer implements GameRendererApi {
       fixAdditiveBlending(this.scene);
     }
     this.post.render(d, time);
+    if (this.handheld) {
+      this.monitorPerformance(d);
+    }
+  }
+
+  private monitorPerformance(dt: number): void {
+    this.avgDt = this.avgDt * 0.92 + dt * 0.08;
+    this.dynamicTimer += dt;
+    if (this.dynamicTimer < 0.75) return;
+    this.dynamicTimer = 0;
+
+    let changed = false;
+    if (this.avgDt > 0.028 && this.dprScale > 0.75) {
+      this.dprScale = Math.max(0.75, this.dprScale - 0.08);
+      changed = true;
+    } else if (this.avgDt < 0.018 && this.dprScale < 1.0) {
+      this.dprScale = Math.min(1.0, this.dprScale + 0.04);
+      changed = true;
+    }
+
+    if (changed) {
+      const nextDpr = Math.round(this.targetDpr * this.dprScale * 100) / 100;
+      if (Math.abs(nextDpr - this.currentDpr) >= 0.05) {
+        this.currentDpr = nextDpr;
+        this.webglRenderer.setPixelRatio(this.currentDpr);
+        this.post.setSize(this.width, this.height, this.currentDpr);
+      }
+    }
   }
 
   private updateShadowCamera(): void {
